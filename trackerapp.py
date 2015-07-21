@@ -271,10 +271,8 @@ class MyApp(QtWidgets.QMainWindow):
             if (self.ui.checkBoxMatlab.isChecked()):
                 plt.show()
                 
-            #create total plot - Plotly -needs account
-            #####Plotly First run:
-            #$ pip install plotly
-            #$ python -c "import plotly; plotly.tools.set_credentials_file(username='qbisoftware',api_key='4oklhj4uhy') ###Login with username='qbisoftware' password='0z1UBCfaEj8k')
+            #create total plot
+            #####Plotly needs an account - follow instructions: https://plot.ly/python/getting-started/
             if (self.ui.checkBoxPlotly.isChecked()):
                 plotly_fig = tls.mpl_to_plotly(fig)
                 #TODO: Need to create meshgrids from sorted data
