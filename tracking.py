@@ -1,12 +1,33 @@
 #! /usr/bin/python
-# Tracking.py
-# for Andreas
-# Description: Count of tracking particles
-# Input: Output file from Tracking program (in csv)
-# Output: csv file with count
+'''
+    tracker.py (GUI version is trackerapp.py)
+    ****************************************************************
+    Description: This script was developed for Andreas in the Meunier Lab at QBI.  It analyses particle tracking information and produces plots.
+    
+    Requirements: Python3, PyQt5, matplotlib, numpy, plotly
+    UI files: created in Qt Designer, loaded dynamically with uic
+    Input: CSV Output file from Tracking program (Metamorph)
+    Output: CSV file with processed data, PNG files if Plotting
+    
+    Copyright (C) 2015  QBI Software, The University of Queensland
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+    '''
 __author__ = "Liz Cooper-Williams (QBI)"
 __date__ = "$11/06/2015 2:09:57 PM$"
-__version__ = 1.1
+__version__ = 1.0
 
 import csv
 import argparse
@@ -16,6 +37,8 @@ import os
 import copy
 import collections
 import numpy as np
+import matplotlib.backends.backend_qt5agg
+matplotlib.use("qt5agg")
 import matplotlib.pyplot as plt
 
 
@@ -88,7 +111,7 @@ class Coord:
                 'dx': self.dx,
                 'dy': self.dy,
                 'rho': self.getpolar_rho(self.dx,self.dy),
-                'theta' : self.getpolar_theta(self.dx,self.dy),
+                'theta' : self.getpolar_theta(self.dy,self.dx),
                 'intensity': self.intensity,
                 'framecount': str(self.framecount)
                 }
@@ -212,11 +235,15 @@ class Tracker():
                 self.counter += 1
 
     def write_output(self, outfilename):
-        if sys.version_info >= (3,0,0):
-            fo = open(outfilename, 'w', newline='')
-        else:
-            fo = open(outfilename, 'wb')
-        print("DEBUG: Output file=", outfilename)
+        msg = "Starting output..."
+        try:
+            if sys.version_info >= (3,0,0):
+                fo = open(outfilename, 'w', newline='')
+            else:
+                fo = open(outfilename, 'wb')
+        except IOError:
+            msg = "ERROR: cannot access output file (maybe open in another program): " + outfilename
+            return msg
         with fo as outfile:
             fieldnames = self.get_headers()
             writer = csv.DictWriter(outfile, delimiter=',',dialect=csv.excel, fieldnames=fieldnames)
@@ -246,7 +273,9 @@ class Tracker():
                 if (myco.track not in self.plotter):
                     self.plotter.update({myco.track:[]})
                 self.plotter[myco.track].append(myco)
-        
+        msg = "Completed"
+        return msg
+    
     def plottrack(self, trak, totalplots=0):
         #create a plot of a track
         plotdir=self.outputdir

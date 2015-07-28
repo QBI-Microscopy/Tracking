@@ -1,24 +1,46 @@
-#!/usr/bin/python
-#
-# Tracker GUI for tracker.py
-# Runs with python3 & PyQt5
-# Load ui dynamically vs generate with pyuic5
-# import plotly
-# plotly.tools.set_credentials_file(username='lizcw5', api_key='jysksuypoy')
-__author__ = "uqecoop2"
+#!/usr/bin/python3
+'''
+    QBI Meunier Tracker APP: GUI for tracker.py (trackerapp.py)
+    **************************************************************
+    Description: This script was developed for Andreas in the Meunier Lab at QBI.  It analyses particle tracking information and produces plots.
+    
+    Requirements: Python3, PyQt5, matplotlib, numpy, plotly
+    UI files: created in Qt Designer, loaded dynamically with uic
+    Input: CSV Output file from Tracking program (Metamorph)
+    Output: CSV file with processed data, PNG files if Plotting
+    
+    Copyright (C) 2015  QBI Software, The University of Queensland
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+    '''
+__author__ = "Liz Cooper-Williams (QBI)"
 __date__ = "$15/06/2015 11:03:33 AM$"
+__version__ = 1.0
 
 import csv
 import os
 import sys, time
-from threading import Thread
+#from threading import Thread
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QSettings
 from tracking import Tracker, Coord
 import matplotlib.pyplot as plt
-import plotly.plotly as py
-import plotly.tools as tls
-from plotly.graph_objs import *
+##Removed in compiled version (unable to locate plotly\\graph_reference\\graph_objs_meta.json)
+#import plotly.plotly as py
+#import plotly.tools as tls
+#from plotly.graph_objs import *
 
 # create a progressBar while running plotter
 class progress(QtWidgets.QDialog):
@@ -68,6 +90,8 @@ class MyApp(QtWidgets.QMainWindow):
         self.ui.txtOutputdir.setText(self.settings.value('outputdir', '.'))
         if (len(self.ui.txtInput.text()) > 5 and len(self.ui.txtOutputdir.text()) > 5 and len(self.ui.txtOutputfile.text()) > 5):
                 self.ui.btnRunScript.setEnabled(True)
+        ##TEMPORARY: Disabled Plotly due to error with build
+        self.ui.checkBoxPlotly.setEnabled(False)
         #Set actions
         self.ui.btnRunScript.clicked.connect(self.runscript)
         self.ui.btnFileBrowser.clicked.connect(self.popupInput)
@@ -85,9 +109,14 @@ class MyApp(QtWidgets.QMainWindow):
         #Check input
         plotfrom = int(self.ui.spinPlotFrom.value())
         plotto = int(self.ui.spinPlotTo.value())
-        if plotfrom == 0:
+        #Plot first plot
+        if (plotfrom <= 1 and plotto <= 1 and plotfrom != plotto):
             plotfrom = 1
-        
+            plotto = 2
+        elif plotfrom == 0 and plotfrom != plotto:
+            plotfrom = 1
+        else :
+            plotto += 1
         #swap if values are incorrect
         if plotto < plotfrom:
             tmp = plotfrom
@@ -106,7 +135,7 @@ class MyApp(QtWidgets.QMainWindow):
                 "Decimals" : int(self.ui.spinDec.value()),
                 "Plots" : numplots,
                 "from" : plotfrom,
-                "to" : plotto + 1
+                "to" : plotto
         }
 
         #Display settings
@@ -196,13 +225,13 @@ class MyApp(QtWidgets.QMainWindow):
         tracker.load_input(params['Input'])
         self.updateStatus("... Input loaded ...")
         outputfilename = params['OutputFile']
-        tracker.write_output(outputfilename)
-        self.updateStatus("... Completed.")
-        self.updateStatus("TOTAL ROWS: " + str(tracker.counter))
-        self.updateStatus("TOTAL TRACKS: " + str(len(tracker.plotter)))
-        
+        msg = tracker.write_output(outputfilename)
+        self.updateStatus(msg)
+                
         #Generate plots (if required)
-        if (tracker.counter > 0):
+        if ( "Completed" in msg) and (tracker.counter > 0):
+            self.updateStatus("TOTAL ROWS: " + str(tracker.counter))
+            self.updateStatus("TOTAL TRACKS: " + str(len(tracker.plotter)))
             plotnum = int(params['Plots'])
             msgs = []
             #All plots
@@ -259,7 +288,9 @@ class MyApp(QtWidgets.QMainWindow):
             fig = plt.figure(tracker.alltracks + 1)
             mytitle = "All " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
             lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta)
-            plt.setp(lines, color='b', linewidth=0.2)
+            plt.setp(lines, color='b', antialiased=True)
+            #plt.linewidth(0.2)
+            #plt.markers.set_markersize(1)
             plt.xlabel('x')
             plt.ylabel('y')
             plt.title(mytitle)
@@ -270,18 +301,20 @@ class MyApp(QtWidgets.QMainWindow):
             
             if (self.ui.checkBoxMatlab.isChecked()):
                 plt.show()
-                
+           
             #create total plot
             #####Plotly needs an account - follow instructions: https://plot.ly/python/getting-started/
-            if (self.ui.checkBoxPlotly.isChecked()):
-                plotly_fig = tls.mpl_to_plotly(fig)
+            
+            ## TEMPORARY: REMOVED DUE TO ERROR WITH BUILD
+            #if (self.ui.checkBoxPlotly.isChecked()):
+             #   plotly_fig = tls.mpl_to_plotly(fig)
                 #TODO: Need to create meshgrids from sorted data
                 #quiver = tls.TraceFactory.create_quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta)
                 #data = Data([quiver])
                 #plotly_fig = Figure(data=data)
-                unique_url = py.plot(plotly_fig, filename = mytitle)
-                self.updateStatus("Plotly Plot saved to " + unique_url)
-            plt.close()
+             #   unique_url = py.plot(plotly_fig, filename = mytitle)
+             #   self.updateStatus("Plotly Plot saved to " + unique_url)
+           # plt.close()
                      
            
             
