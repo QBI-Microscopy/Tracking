@@ -13,7 +13,7 @@ matplotlib
 numpy
 plotly
 
-# Python
+### Python
 From a terminal window, check your python version with:
 >python --version
 Python v3.4.3
@@ -27,19 +27,19 @@ try >python3 --version
 (it is possible to change the system default through redirecting the symlink for /usr/local/bin/python)
 otherwise see https://www.python.org/download/other/
 
-# PyQt5
+### PyQt5
 Manual installation of PyQt5 : http://pyqt.sourceforge.net/Docs/PyQt5/installation.html
 This involves download (SIP and PyQt5), make and install commands
 
-# Matplotlib
+### Matplotlib
 Usually installed via python pip installer:
 >pip install matplotlib
 
-# Numpy
+### Numpy
 Usually installed via python pip installer:
 >pip install numpy
 
-# Plotly
+### Plotly
 (see https://plot.ly/python/getting-started/)
 Usually installed via python pip installer:
 >pip install plotly
