@@ -5,8 +5,8 @@ See Wiki for further information
 # Installation
 A 64bit Windows installation is provided. 
 
-# Manual Installation
-## Requirements
+## Manual Installation
+### Requirements
 Python 3.4+
 PyQt5 (installed/copied) to Python<version>/Lib/site-packages
 matplotlib
