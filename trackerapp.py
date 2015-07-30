@@ -101,6 +101,8 @@ class MyApp(QtWidgets.QMainWindow):
         #Setup ProgressBar
         self.progress = progress(self)
         self.finished = False
+        #Allow save fig
+        self.fig = None
          
 
     def loadparams(self):
@@ -213,12 +215,14 @@ class MyApp(QtWidgets.QMainWindow):
         tracker = Tracker()
 
         #Check input file has correct headings
-        if (not tracker.checkinputheaders(params['Input'])):
-            self.updateStatus("***ERROR: CSV Input file headers not matching, exiting ***")
-            self.updateStatus("CSV HEADERS SHOULD BE:")
+        validinput = tracker.checkinputheaders(params['Input'])
+        if (not validinput):
+            self.updateStatus("***ERROR: Input file not valid, exiting ***")
+            self.updateStatus("Order of rows (with/without headers) should be:")
             for hdr in tracker.inputheaders:
                 self.updateStatus(hdr)
             return 0
+         
         #Generate output file
         tracker.numdecimal = int(params['Decimals'])
         self.updateStatus("Starting ...")
@@ -285,7 +289,7 @@ class MyApp(QtWidgets.QMainWindow):
         self.progress.stop()
         #create total plot - Matlab
         if (totalplots > 0):
-            fig = plt.figure(tracker.alltracks + 1)
+            self.fig = plt.figure(tracker.alltracks + 1)
             mytitle = "All " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
             lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta)
             plt.setp(lines, color='b', antialiased=True)
@@ -296,7 +300,7 @@ class MyApp(QtWidgets.QMainWindow):
             plt.title(mytitle)
             #save to file
             filename = tracker.outputdir + "Tracks_" + str(plotrange[0]) + "to" + str(plotrange[-1]) + ".png"
-            fig.savefig(filename, dpi=300, orientation='landscape',format='png')
+            self.fig.savefig(filename, dpi=300, orientation='landscape',format='png')
             self.updateStatus("Total Plot saved to " + filename)
             
             if (self.ui.checkBoxMatlab.isChecked()):
@@ -335,7 +339,9 @@ class MyApp(QtWidgets.QMainWindow):
             # Write window size and position to config file
             self.settings.setValue("size", self.size())
             self.settings.setValue("pos", self.pos())
-            
+            self.progress.close()
+            if (self.fig is not None):
+                self.fig.close()
         else:
             event.ignore()
 

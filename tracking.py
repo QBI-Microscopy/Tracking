@@ -181,19 +181,39 @@ class Tracker():
         self.fromplot = fromplot
     def set_toplot(self, toplot):
         self.toplot = toplot    
+    '''Checks CSV file to see if valid and if contains headers
+       returns 0 if not valid, 1 if valid with headers, 2 valid but no headers
+    '''
     def checkinputheaders(self, inputfilename):
-        valid = True
+        valid = 1
         #Open input file
         if sys.version_info >= (3,0,0):
             fi = open(inputfilename, 'r', newline='')
         else:
             fi = open(inputfilename, 'rb')
         with fi as csvfile:
-            inputreader = csv.DictReader(csvfile)
-            for hdr in self.inputheaders:
-                if hdr not in inputreader.fieldnames:
-                    valid = False
-                    break
+            if (csv.Sniffer().has_header(csvfile.read(1024))):
+                csvfile.seek(0)
+                inputreader = csv.DictReader(csvfile)
+                for hdr in self.inputheaders:
+                    if hdr not in inputreader.fieldnames:
+                        valid = 0
+                        break
+            else:
+               dialect = csv.Sniffer().sniff(csvfile.read(1024))
+               csvfile.seek(0)
+               reader = csv.reader(csvfile, dialect)
+               for row in reader:
+                   if (int(row[0]) > 0 and 
+                       int(row[1]) > 0 and 
+                       float(row[2]) > 0 and 
+                       float(row[3]) > 0 and 
+                       float(row[5]) > 0):
+                       valid = 2
+                       break
+                   else:
+                       valid = 0
+                       break
         
         return valid     
                     
@@ -205,20 +225,30 @@ class Tracker():
             fi = open(inputfilename, 'rb')
 
         with fi as csvfile:
-            fh = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+            hasheader = csv.Sniffer().has_header(csvfile.read(1024))
+            csvfile.seek(0)
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+            csvfile.seek(0)
+            fh = csv.reader(csvfile, dialect)
             for row in fh:
                 self.ln = fh.line_num
-                if (len(row) == 0):
-                    fh.next()
+                #print("Row " , fh.line_num)
+                if (len(row) == 0 or (self.ln == 1 and hasheader)):
+                    continue
                 #Change in x,y wrt next row:  x(t+1) - x(t)
-                coord = Coord(int(row['TRACK NUMBER']),
-                        int(row['frame number']),
-                        float(row['x']),float(row['y']),
-                        float(row['intensity']) )
+                #coord = Coord(int(row['TRACK NUMBER']),
+                #        int(row['frame number']),
+                #        float(row['x']),float(row['y']),
+                #        float(row['intensity']) )
+                coord = Coord(int(row[0]),
+                        int(row[1]),
+                        float(row[2]),float(row[3]),
+                        float(row[5]) )
 
                 if (self.track != coord.track):
                     print("TRACK:" + str(self.track))
-                    self.track = int(row['TRACK NUMBER'])
+                    #self.track = int(row['TRACK NUMBER'])
+                    self.track = int(row[0])
                 else:
                     self.cache.dx = coord.x - self.cache.x
                     self.cache.dy = coord.y - self.cache.y
@@ -277,40 +307,44 @@ class Tracker():
         return msg
     
     def plottrack(self, trak, totalplots=0):
-        #create a plot of a track
-        plotdir=self.outputdir
-        x = []
-        y = []
-        rho = []
-        theta = []
-        mytitle = "Track: " + str(trak)
-        print(mytitle)
-        for tn in self.plotter[trak]:
-            x.append(tn.x)
-            y.append(tn.y)
-            rho.append(tn.getpolar_rho(tn.dx,tn.dy))
-            theta.append(tn.getpolar_theta(tn.dx,tn.dy))
-        print("Points:", len(x))
-        fig = plt.figure(trak)
-        lines = plt.quiver(x,y,rho,theta)
-        plt.setp(lines, color='b', linewidth=0.2)
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.title(mytitle)
-        #Write to file
-        filename = plotdir + "Track_" + str(trak) + ".png"
-        fig.savefig(filename, dpi=300, orientation='landscape', format='png')
-        #Total plots if option set
-        if (totalplots > 0):
-            self.allx += x
-            self.ally += y
-            self.allrho += rho
-            self.alltheta += theta
-            self.alltracks += 1
-        plt.cla()
-        plt.clf()
-        plt.close()
-        msg ="Plot saved to " + filename
+        if (trak in self.plotter):
+            
+            #create a plot of a track
+            plotdir=self.outputdir
+            x = []
+            y = []
+            rho = []
+            theta = []
+            mytitle = "Track: " + str(trak)
+            print(mytitle)
+            for tn in self.plotter[trak]:
+                x.append(tn.x)
+                y.append(tn.y)
+                rho.append(tn.getpolar_rho(tn.dx,tn.dy))
+                theta.append(tn.getpolar_theta(tn.dx,tn.dy))
+            print("Points:", len(x))
+            fig = plt.figure(trak)
+            lines = plt.quiver(x,y,rho,theta)
+            plt.setp(lines, color='b', linewidth=0.2)
+            plt.xlabel('x')
+            plt.ylabel('y')
+            plt.title(mytitle)
+            #Write to file
+            filename = plotdir + "Track_" + str(trak) + ".png"
+            fig.savefig(filename, dpi=300, orientation='landscape', format='png')
+            #Total plots if option set
+            if (totalplots > 0):
+                self.allx += x
+                self.ally += y
+                self.allrho += rho
+                self.alltheta += theta
+                self.alltracks += 1
+            plt.cla()
+            plt.clf()
+            plt.close()
+            msg ="Plot saved to " + filename
+        else:
+            msg = "Track " + str(trak) + " has no data - skipped"
         print(msg)
         return msg
 
