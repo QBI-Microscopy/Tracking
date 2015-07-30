@@ -341,7 +341,7 @@ class MyApp(QtWidgets.QMainWindow):
             self.settings.setValue("pos", self.pos())
             self.progress.close()
             if (self.fig is not None):
-                self.fig.close()
+                plt.close(self.fig)
         else:
             event.ignore()
 
