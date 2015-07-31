@@ -18,11 +18,13 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-includes = ["sip", "PyQt5", "matplotlib", "plotly"]
-
+build_exe_options = {
+    "includes" : ["sip", "PyQt5", "matplotlib", "plotly"], 
+    "include_files" : ["tracker.ui", "tracker_progress.ui", "tracker_help.ui", "resources/48px-Go-next.svg.png","resources/Help-browser.svg.png"],    "include_msvcr" : 1 
+   }
 setup(
         name = application_title,
-        version = "1.0",
+        version = "1.1",
         description = "Tracker script with GUI",
         author="Liz Cooper-Williams, QBI",
         author_email="e.cooperwilliams@uq.edu.au",
@@ -30,5 +32,6 @@ setup(
         maintainer_email="qbi@uq.edu.au",
         url="http://github.com/QBI-Microscopy/Tracking",
         license="GNU General Public License (GPL)",
-        options = {"build_exe" : {"includes" : includes, "include_files" : ["tracker.ui", "tracker_progress.ui", "tracker_help.ui"], "include_msvcr" : 1},},
-        executables = [Executable(main_python_file, base = base)])
+        options = {"build_exe" : build_exe_options,},
+        executables = [Executable(main_python_file, base = base, targetName="trackerapp.exe",icon="resources/target.ico",
+        shortcutName=application_title, shortcutDir="DesktopFolder")])

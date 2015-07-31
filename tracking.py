@@ -193,6 +193,7 @@ class Tracker():
             fi = open(inputfilename, 'rb')
         with fi as csvfile:
             if (csv.Sniffer().has_header(csvfile.read(1024))):
+                print("DEBUG: CSV file has headers")
                 csvfile.seek(0)
                 inputreader = csv.DictReader(csvfile)
                 for hdr in self.inputheaders:
@@ -200,10 +201,13 @@ class Tracker():
                         valid = 0
                         break
             else:
-               dialect = csv.Sniffer().sniff(csvfile.read(1024))
                csvfile.seek(0)
-               reader = csv.reader(csvfile, dialect)
+               dialect = csv.Sniffer().sniff(csvfile.read(1024))
+               print("DEBUG: Delimiter = ", dialect.delimiter)
+               csvfile.seek(0)
+               reader = csv.reader(csvfile, dialect=dialect)
                for row in reader:
+                   print("DEBUG: Row[0]=", row[0])
                    if (int(row[0]) > 0 and 
                        int(row[1]) > 0 and 
                        float(row[2]) > 0 and 
@@ -306,7 +310,7 @@ class Tracker():
         msg = "Completed"
         return msg
     
-    def plottrack(self, trak, totalplots=0):
+    def plottrack(self, trak, totalplots=0, arrow=0.2):
         if (trak in self.plotter):
             
             #create a plot of a track
@@ -324,8 +328,8 @@ class Tracker():
                 theta.append(tn.getpolar_theta(tn.dx,tn.dy))
             print("Points:", len(x))
             fig = plt.figure(trak)
-            lines = plt.quiver(x,y,rho,theta)
-            plt.setp(lines, color='b', linewidth=0.2)
+            lines = plt.quiver(x,y,rho,theta,units='x',pivot='tip',width=arrow)
+            plt.setp(lines, color='b', antialiased=True)
             plt.xlabel('x')
             plt.ylabel('y')
             plt.title(mytitle)

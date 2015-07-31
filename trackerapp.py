@@ -32,6 +32,8 @@ __version__ = 1.0
 import csv
 import os
 import sys, time
+from os.path import expanduser
+homedir = expanduser("~")
 #from threading import Thread
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QSettings
@@ -78,9 +80,11 @@ class MyApp(QtWidgets.QMainWindow):
     notify = QtCore.pyqtSignal(int)
     def __init__(self):
         super(MyApp, self).__init__()
-        self.ui = uic.loadUi("tracker.ui", self)
+        self.ui = uic.loadUi(os.getcwd() + os.path.sep + "tracker.ui", self)
         #Load Config
-        self.settings = QSettings('.config.ini', QSettings.IniFormat)
+        configfile = homedir + os.path.sep + '.trackerconfig.ini'
+        print("Config:" , configfile)
+        self.settings = QSettings(configfile, QSettings.IniFormat)
         self.settings.setFallbacksEnabled(False)
         #load ini
         # Initial window size/pos last saved if available
@@ -88,6 +92,7 @@ class MyApp(QtWidgets.QMainWindow):
         self.move(self.settings.value('pos', QtCore.QPoint(50, 50)))
         self.ui.txtInput.setText(self.settings.value('datafile', '.'))
         self.ui.txtOutputdir.setText(self.settings.value('outputdir', '.'))
+        self.ui.doubleSpinBox.setValue(float(self.settings.value('arrow', '0.20')))
         if (len(self.ui.txtInput.text()) > 5 and len(self.ui.txtOutputdir.text()) > 5 and len(self.ui.txtOutputfile.text()) > 5):
                 self.ui.btnRunScript.setEnabled(True)
         ##TEMPORARY: Disabled Plotly due to error with build
@@ -103,7 +108,7 @@ class MyApp(QtWidgets.QMainWindow):
         self.finished = False
         #Allow save fig
         self.fig = None
-         
+        
 
     def loadparams(self):
         paramslist = QtGui.QStandardItemModel(self.ui.listOutput)
@@ -117,7 +122,7 @@ class MyApp(QtWidgets.QMainWindow):
             plotto = 2
         elif plotfrom == 0 and plotfrom != plotto:
             plotfrom = 1
-        else :
+        elif plotto != 0:
             plotto += 1
         #swap if values are incorrect
         if plotto < plotfrom:
@@ -186,8 +191,9 @@ class MyApp(QtWidgets.QMainWindow):
     def popupInput(self):
         browser = QtWidgets.QFileDialog(self)
         browser.setFileMode(QtWidgets.QFileDialog.ExistingFiles)
-        fname = browser.getOpenFileName(self, 'Choose a data file', self.settings.value('datafile', '.'),
-                'CSV files (*.csv)')
+        fname = browser.getOpenFileName(self, 'Choose a data file',        
+            self.settings.value('datafile', '.'),
+                'CSV files (*.csv *.trc)')
         if fname:
             self.ui.txtInput.setText(str(fname[0]))
             #Check if both files selected
@@ -276,6 +282,8 @@ class MyApp(QtWidgets.QMainWindow):
         #run plots
         tracker.init_allplots()
         totalplots = 0
+        arrowwidth = self.ui.doubleSpinBox.value()
+        
         if (self.ui.checkBoxMatlab.isChecked() or self.ui.checkBoxPlotly.isChecked()):
            totalplots = 1
         i = 0
@@ -284,16 +292,17 @@ class MyApp(QtWidgets.QMainWindow):
                 i += 1
                 self.progress.update(i)
                 QtWidgets.QApplication.processEvents()
-                msg = tracker.plottrack(trak, totalplots)
+                msg = tracker.plottrack(trak, totalplots, arrowwidth)
                 self.updateStatus(msg)
         self.progress.stop()
         #create total plot - Matlab
         if (totalplots > 0):
             self.fig = plt.figure(tracker.alltracks + 1)
+            
             mytitle = "All " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
-            lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta)
-            plt.setp(lines, color='b', antialiased=True)
-            #plt.linewidth(0.2)
+            lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta,units='x', pivot='tip', width=arrowwidth)
+            plt.setp(lines, antialiased=True)
+            #plt.linewidth(0.05)
             #plt.markers.set_markersize(1)
             plt.xlabel('x')
             plt.ylabel('y')
@@ -339,6 +348,7 @@ class MyApp(QtWidgets.QMainWindow):
             # Write window size and position to config file
             self.settings.setValue("size", self.size())
             self.settings.setValue("pos", self.pos())
+            self.settings.setValue("arrow", self.ui.doubleSpinBox.value())
             self.progress.close()
             if (self.fig is not None):
                 plt.close(self.fig)
