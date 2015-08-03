@@ -22,6 +22,7 @@ build_exe_options = {
     "includes" : ["sip", "PyQt5", "matplotlib", "plotly"], 
     "include_files" : ["tracker.ui", "tracker_progress.ui", "tracker_help.ui", "resources/48px-Go-next.svg.png","resources/Help-browser.svg.png"],    "include_msvcr" : 1 
    }
+# [Bad fix but only thing that works] NB To add Shortcut working dir - change cx_freeze/windist.py Line 61 : last None - > "TARGETDIR" 
 setup(
         name = application_title,
         version = "1.1",

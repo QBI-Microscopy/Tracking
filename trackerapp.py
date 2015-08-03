@@ -80,7 +80,8 @@ class MyApp(QtWidgets.QMainWindow):
     notify = QtCore.pyqtSignal(int)
     def __init__(self):
         super(MyApp, self).__init__()
-        self.ui = uic.loadUi(os.getcwd() + os.path.sep + "tracker.ui", self)
+        
+        self.ui = uic.loadUi("tracker.ui", self)
         #Load Config
         configfile = homedir + os.path.sep + '.trackerconfig.ini'
         print("Config:" , configfile)
