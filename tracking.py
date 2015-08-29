@@ -37,8 +37,9 @@ import os
 import copy
 import collections
 import numpy as np
+import matplotlib
+matplotlib.use("Qt5Agg")
 import matplotlib.backends.backend_qt5agg
-matplotlib.use("qt5agg")
 import matplotlib.pyplot as plt
 
 
