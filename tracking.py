@@ -34,13 +34,15 @@ import argparse
 import sys
 import inspect
 import os
-import copy
 import collections
-import numpy as np
-import matplotlib.backends.backend_qt5agg
-matplotlib.use("qt5agg")
-import matplotlib.pyplot as plt
 
+import numpy as np
+import matplotlib
+
+matplotlib.use("Qt5Agg")
+import matplotlib.pyplot as plt
+from shapely.geometry import Polygon, Point
+from trackerplots.contourplot import ContourPlot
 
 def get_filename(prompt, complaint='Unable to find file!'):
     while True:
@@ -77,6 +79,12 @@ class Coord:
         self.intensity = intensity
         self.framecount = 1
 
+    def load(self, dx,dy,rho,theta,framecount):
+        self.dx = dx
+        self.dy = dy
+        self.rho = rho
+        self.theta = theta
+        self.framecount = framecount
 
     def get_headers(self):
         return self.fieldnames
@@ -132,7 +140,7 @@ class Coord:
         return theta
 
 
-class Tracker():
+class Tracker:
 
     def __init__(self):
         self.counter = 0
@@ -150,6 +158,7 @@ class Tracker():
         self.fromplot = 0
         self.toplot = 0
         self.init_allplots()
+        self.roilist = []
         
     def init_allplots(self):
         #for all tracks
@@ -300,9 +309,13 @@ class Tracker():
                     myco = Coord(co1.track, self.avg(avg_frame),co1.x, co1.y,self.avg(avg_intensity))
                     myco.dx = self.avg(avg_dx)
                     myco.dy = self.avg(avg_dy)
+                    myco.rho = myco.getpolar_rho(myco.dx,myco.dy)
+                    myco.theta = myco.getpolar_theta(myco.dx,myco.dy)
                     myco.framecount = len(self.coordlist[co])
                 else:
                     myco = self.coordlist[co][0]
+                    myco.rho = myco.getpolar_rho(myco.dx,myco.dy)
+                    myco.theta = myco.getpolar_theta(myco.dx,myco.dy)
                 writer.writerow(myco.get_rowoutput(self.numdecimal))
                 if (myco.track not in self.plotter):
                     self.plotter.update({myco.track:[]})
@@ -310,7 +323,7 @@ class Tracker():
         msg = "Completed"
         return msg
     
-    def plottrack(self, trak, totalplots=0, arrow=0.2):
+    def plottrack(self, trak, totalplots=0, arrow=0.2,png=1):
         if (trak in self.plotter):
             
             #create a plot of a track
@@ -321,32 +334,34 @@ class Tracker():
             theta = []
             mytitle = "Track: " + str(trak)
             print(mytitle)
+            msg = mytitle
             for tn in self.plotter[trak]:
                 x.append(tn.x)
                 y.append(tn.y)
                 rho.append(tn.getpolar_rho(tn.dx,tn.dy))
                 theta.append(tn.getpolar_theta(tn.dx,tn.dy))
             print("Points:", len(x))
-            fig = plt.figure(trak)
-            lines = plt.quiver(x,y,rho,theta,units='x',pivot='tip',width=arrow)
-            plt.setp(lines, color='b', antialiased=True)
-            plt.xlabel('x')
-            plt.ylabel('y')
-            plt.title(mytitle)
-            #Write to file
-            filename = plotdir + "Track_" + str(trak) + ".png"
-            fig.savefig(filename, dpi=300, orientation='landscape', format='png')
-            #Total plots if option set
+            #Total plots if option set to show later
             if (totalplots > 0):
                 self.allx += x
                 self.ally += y
                 self.allrho += rho
                 self.alltheta += theta
                 self.alltracks += 1
-            plt.cla()
-            plt.clf()
-            plt.close()
-            msg ="Plot saved to " + filename
+            if (png):
+                fig = plt.figure(trak)
+                lines = plt.quiver(x,y,rho,theta,units='x',pivot='tip',width=arrow)
+                plt.setp(lines, color='b', antialiased=True)
+                plt.xlabel('x')
+                plt.ylabel('y')
+                plt.title(mytitle)
+                #Write to file
+                filename = plotdir + "Track_" + str(trak) + ".png"
+                fig.savefig(filename, dpi=300, orientation='landscape', format='png')
+                msg ="Plot saved to " + filename
+                plt.cla()
+                plt.clf()
+                plt.close()
         else:
             msg = "Track " + str(trak) + " has no data - skipped"
         print(msg)
@@ -427,15 +442,54 @@ class Tracker():
         
         return msgs
 
+    def plot_region(self,mlpoly):
+        poly = Polygon(mlpoly)
+        #reset coords
+        self.roilist = []
+        tplot = ContourPlot()
+
+        sname = '1'
+        for co in self.coordlist:
+            for myco in self.coordlist[co]:
+                if poly.contains(Point(myco.x,myco.y)):
+                    sname = str(int(myco.x)) + '_' + str(int(myco.y))
+                    self.roilist.append(myco)
+                    tplot.loadrow(myco.x,myco.y,myco.rho,myco.frame)
+        msg = 'Total ROI points=' + str(len(self.roilist))
+        print(msg)
+        fname= self.outputdir + 'ROI_' + sname + '.csv'
+        msg = msg + ": " + self.print_region(fname)
+        tplot.contour_region('ROI_' + sname)
+        return msg
+
+    def print_region(self,outfilename):
+        msg = "Starting ROI output..."
+        try:
+            if sys.version_info >= (3,0,0):
+                fo = open(outfilename, 'w', newline='')
+            else:
+                fo = open(outfilename, 'wb')
+        except IOError:
+            msg = "ERROR: cannot access output file (maybe open in another program): " + outfilename
+            return msg
+        with fo as outfile:
+            fieldnames = self.get_headers()
+            writer = csv.DictWriter(outfile, delimiter=',',dialect=csv.excel, fieldnames=fieldnames)
+            writer.writeheader()
+            for myco in self.roilist:
+                writer.writerow(myco.get_rowoutput(self.numdecimal))
+        msg = 'ROI coordinates written to ' + outfilename
+        print(msg)
+        return msg
 ## Main
 if __name__ == "__main__":
 
     print(inspect.getfile(inspect.currentframe())) # script filename (usually with path)
     defaultSrcPath = os.getcwd() # current directory
-    defaultDataPath = 'D:/Data/DevTracking/data'
+    defaultDataPath = 'sampledata'
     print("Default path: " , defaultDataPath)
     defaultDatafile = defaultDataPath + '/trackfile.csv'
-    defaultOutfile = defaultDataPath + '/output/outfile.csv'
+    defaultOutfile = defaultDataPath + '/outfile.csv'
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", dest = "filename",
@@ -450,8 +504,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if (not file_check(args.filename)):
         sys.exit()
-    if (not file_check(args.outfilename)):
-        sys.exit()
+    #if (not file_check(args.outfilename)):
+    #    sys.exit()
     #update data path if not default
     if (args.outfilename != defaultOutfile):
         idx = args.outfilename.rindex(os.path.sep)

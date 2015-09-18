@@ -51,9 +51,13 @@
      <rect>
       <x>450</x>
       <y>60</y>
-      <width>93</width>
-      <height>28</height>
+      <width>90</width>
+      <height>35</height>
      </rect>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>resources/open.png</normaloff>resources/open.png</iconset>
     </property>
     <property name="text">
      <string>Browse</string>
@@ -68,7 +72,7 @@
       <x>560</x>
       <y>200</y>
       <width>93</width>
-      <height>51</height>
+      <height>50</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -79,7 +83,7 @@
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>48px-Go-next.svg.png</normaloff>48px-Go-next.svg.png</iconset>
+      <normaloff>resources/48px-Go-next.svg.png</normaloff>resources/48px-Go-next.svg.png</iconset>
     </property>
     <property name="shortcut">
      <string>Ctrl+R</string>
@@ -169,13 +173,17 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>97</y>
-      <width>93</width>
-      <height>28</height>
+      <y>95</y>
+      <width>90</width>
+      <height>35</height>
      </rect>
     </property>
     <property name="text">
      <string>Browse</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>resources/open.png</normaloff>resources/open.png</iconset>
     </property>
    </widget>
    <widget class="QLineEdit" name="txtOutputdir">
@@ -266,122 +274,27 @@
      <string>Output Pane</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="spinPlotFrom">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>190</y>
-      <width>100</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="sizeIncrement">
-     <size>
-      <width>3</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="toolTipDuration">
-     <number>-1</number>
-    </property>
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>10000</number>
-    </property>
-    <property name="singleStep">
-     <number>1</number>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="spinPlotTo">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>190</y>
-      <width>100</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="sizeIncrement">
-     <size>
-      <width>3</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="toolTipDuration">
-     <number>-1</number>
-    </property>
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>10000</number>
-    </property>
-    <property name="singleStep">
-     <number>1</number>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>200</y>
-      <width>41</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>From</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>200</y>
-      <width>21</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>To</string>
-    </property>
-   </widget>
    <widget class="QToolButton" name="toolButtonHelp">
     <property name="geometry">
      <rect>
       <x>606</x>
       <y>10</y>
-      <width>41</width>
+      <width>51</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>...</string>
+     <string>Info</string>
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>Help-browser.svg.png</normaloff>Help-browser.svg.png</iconset>
+      <normaloff>resources/Help-browser.svg.png</normaloff>resources/Help-browser.svg.png</iconset>
     </property>
-   </widget>
-   <widget class="QPushButton" name="btnClear">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>60</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Clear</string>
+    <property name="iconSize">
+     <size>
+      <width>32</width>
+      <height>32</height>
+     </size>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBoxMatlab">
@@ -389,7 +302,7 @@
      <rect>
       <x>130</x>
       <y>230</y>
-      <width>91</width>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
@@ -400,26 +313,7 @@
      <number>5</number>
     </property>
     <property name="text">
-     <string>Matlab plot</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBoxPlotly">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>230</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Popup each plot as a Matlab plot (limited range recommended)</string>
-    </property>
-    <property name="toolTipDuration">
-     <number>5</number>
-    </property>
-    <property name="text">
-     <string>Plotly plot</string>
+     <string>Matlab</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_11">
@@ -438,50 +332,12 @@
      <pixmap>resources/target.png</pixmap>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>230</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Default is 0.2</string>
-    </property>
-    <property name="toolTipDuration">
-     <number>5</number>
-    </property>
-    <property name="maximum">
-     <double>0.500000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.010000000000000</double>
-    </property>
-    <property name="value">
-     <double>0.200000000000000</double>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_12">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>230</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Arrow size</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupPlots">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>171</y>
-      <width>531</width>
+      <width>541</width>
       <height>91</height>
      </rect>
     </property>
@@ -494,8 +350,8 @@
     <widget class="QCheckBox" name="checkBoxAllPlots">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>27</y>
+       <x>120</x>
+       <y>24</y>
        <width>70</width>
        <height>20</height>
       </rect>
@@ -504,6 +360,233 @@
       <string>All Plots</string>
      </property>
     </widget>
+    <widget class="QSpinBox" name="spinPlotTo">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>20</y>
+       <width>100</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>3</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTipDuration">
+      <number>-1</number>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>24</y>
+       <width>21</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>To</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinPlotFrom">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>20</y>
+       <width>100</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>3</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTipDuration">
+      <number>-1</number>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>27</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>From</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>24</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+       <underline>false</underline>
+      </font>
+     </property>
+     <property name="text">
+      <string>Range</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox">
+     <property name="geometry">
+      <rect>
+       <x>468</x>
+       <y>60</y>
+       <width>62</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Default is 0.2</string>
+     </property>
+     <property name="toolTipDuration">
+      <number>5</number>
+     </property>
+     <property name="maximum">
+      <double>0.500000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.200000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>395</x>
+       <y>60</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Arrow size</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+       <underline>false</underline>
+      </font>
+     </property>
+     <property name="text">
+      <string>Display</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="checkBoxPlotly">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>60</y>
+       <width>61</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Popup each plot as a Matlab plot (limited range recommended)</string>
+     </property>
+     <property name="toolTipDuration">
+      <number>5</number>
+     </property>
+     <property name="text">
+      <string>Plotly</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="checkPNG">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>60</y>
+       <width>89</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PNG</string>
+     </property>
+    </widget>
+    <zorder>checkBoxAllPlots</zorder>
+    <zorder>spinPlotTo</zorder>
+    <zorder>label_9</zorder>
+    <zorder>spinPlotFrom</zorder>
+    <zorder>label_8</zorder>
+    <zorder>label_7</zorder>
+    <zorder>doubleSpinBox</zorder>
+    <zorder>doubleSpinBox</zorder>
+    <zorder>label_12</zorder>
+    <zorder>label_10</zorder>
+    <zorder>checkBoxPlotly</zorder>
+    <zorder>checkPNG</zorder>
+   </widget>
+   <widget class="QPushButton" name="btnClear">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>300</y>
+      <width>61</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>resources/clear.png</normaloff>resources/clear.png</iconset>
+    </property>
    </widget>
    <zorder>groupPlots</zorder>
    <zorder>label</zorder>
@@ -520,17 +603,10 @@
    <zorder>txtOutputfile</zorder>
    <zorder>label_5</zorder>
    <zorder>label_6</zorder>
-   <zorder>spinPlotFrom</zorder>
-   <zorder>spinPlotTo</zorder>
-   <zorder>label_8</zorder>
-   <zorder>label_9</zorder>
    <zorder>toolButtonHelp</zorder>
-   <zorder>btnClear</zorder>
    <zorder>checkBoxMatlab</zorder>
-   <zorder>checkBoxPlotly</zorder>
    <zorder>label_11</zorder>
-   <zorder>doubleSpinBox</zorder>
-   <zorder>label_12</zorder>
+   <zorder>btnClear</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -538,7 +614,7 @@
      <x>0</x>
      <y>0</y>
      <width>670</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

@@ -29,16 +29,17 @@ __author__ = "Liz Cooper-Williams (QBI)"
 __date__ = "$15/06/2015 11:03:33 AM$"
 __version__ = 1.0
 
-import csv
 import os
-import sys, time
 from os.path import expanduser
 homedir = expanduser("~")
-#from threading import Thread
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QSettings
-from tracking import Tracker, Coord
+from tracking import Tracker
 import matplotlib.pyplot as plt
+from matplotlib.widgets import LassoSelector
+from matplotlib.patches import Polygon
+from matplotlib.lines import Line2D
+
 ##Removed in compiled version (unable to locate plotly\\graph_reference\\graph_objs_meta.json)
 #import plotly.plotly as py
 #import plotly.tools as tls
@@ -80,8 +81,8 @@ class MyApp(QtWidgets.QMainWindow):
     notify = QtCore.pyqtSignal(int)
     def __init__(self):
         super(MyApp, self).__init__()
-        
-        self.ui = uic.loadUi("tracker.ui", self)
+        uifile = os.getcwd() + os.path.sep +"tracker.ui"
+        self.ui = uic.loadUi(uifile, self)
         #Load Config
         configfile = homedir + os.path.sep + '.trackerconfig.ini'
         print("Config:" , configfile)
@@ -109,7 +110,7 @@ class MyApp(QtWidgets.QMainWindow):
         self.finished = False
         #Allow save fig
         self.fig = None
-        
+        self.tracker = None
 
     def loadparams(self):
         paramslist = QtGui.QStandardItemModel(self.ui.listOutput)
@@ -180,14 +181,19 @@ class MyApp(QtWidgets.QMainWindow):
 
     def clearfields(self):
         for widget in self.ui.centralwidget.children():
-            if isinstance(widget, QtWidgets.QLineEdit):
-                widget.setText('')
-            if isinstance(widget, QtWidgets.QCheckBox):
-                widget.setChecked(False)
-            if isinstance(widget, QtWidgets.QListView):
-                widget.clear()
-            if isinstance(widget, QtWidgets.QSpinBox):
-                widget.setValue(widget.minimum())
+            # if isinstance(widget, QtWidgets.QLineEdit):
+            #     widget.setText('')
+            # if isinstance(widget, QtWidgets.QCheckBox):
+            #     widget.setChecked(False)
+            if isinstance(widget, QtWidgets.QScrollArea):
+                self.clearStatus()
+                #widget.clear()
+                #for wc in widget.children():
+                #    if isinstance(wc, QtWidgets.QListView):
+                 #       wc.clear()
+
+            # if isinstance(widget, QtWidgets.QSpinBox):
+            #     widget.setValue(widget.minimum())
 
     def popupInput(self):
         browser = QtWidgets.QFileDialog(self)
@@ -261,7 +267,8 @@ class MyApp(QtWidgets.QMainWindow):
                 #Extract subset
                 r = range(params['from'], params['to'])
                 #Run plots in a thread
-                self.startPlots(tracker, r)
+                self.tracker = tracker
+                self.startPlots(r)
                 
 
             #Save settings
@@ -272,48 +279,66 @@ class MyApp(QtWidgets.QMainWindow):
     
     '''Create plots from output data - requires loaded tracker and range of plot numbers to plot
     '''
-    def startPlots(self, tracker, plotrange):
+    def startPlots(self, plotrange):
+        tracker = self.tracker
         self.updateStatus("Output plots to " + tracker.outputdir)
         msgs =[]
         self.progress.total(len(plotrange))
         self.progress.finished = False
         self.progress.show()
         self.notify.connect(self.progress.update)
-       
+
         #run plots
         tracker.init_allplots()
-        totalplots = 0
+        totalplots = (self.ui.checkBoxMatlab.isChecked() or self.ui.checkBoxPlotly.isChecked())
         arrowwidth = self.ui.doubleSpinBox.value()
-        
-        if (self.ui.checkBoxMatlab.isChecked() or self.ui.checkBoxPlotly.isChecked()):
-           totalplots = 1
+        pngplots = self.ui.checkPNG.isChecked()
         i = 0
         for trak in plotrange:
             if (self.progress.finished == False):
                 i += 1
                 self.progress.update(i)
                 QtWidgets.QApplication.processEvents()
-                msg = tracker.plottrack(trak, totalplots, arrowwidth)
+                msg = tracker.plottrack(trak, totalplots, arrowwidth,pngplots)
                 self.updateStatus(msg)
         self.progress.stop()
         #create total plot - Matlab
         if (totalplots > 0):
             self.fig = plt.figure(tracker.alltracks + 1)
-            
+
             mytitle = "All " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
             lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta,units='x', pivot='tip', width=arrowwidth)
             plt.setp(lines, antialiased=True)
-            #plt.linewidth(0.05)
-            #plt.markers.set_markersize(1)
             plt.xlabel('x')
             plt.ylabel('y')
             plt.title(mytitle)
             #save to file
-            filename = tracker.outputdir + "Tracks_" + str(plotrange[0]) + "to" + str(plotrange[-1]) + ".png"
-            self.fig.savefig(filename, dpi=300, orientation='landscape',format='png')
-            self.updateStatus("Total Plot saved to " + filename)
+            if (pngplots):
+                filename = tracker.outputdir + "Tracks_" + str(plotrange[0]) + "to" + str(plotrange[-1]) + ".png"
+                self.fig.savefig(filename, dpi=300, orientation='landscape',format='png')
+                self.updateStatus("Total Plot saved to " + filename)
             
             if (self.ui.checkBoxMatlab.isChecked()):
+                #plt.show()
+                ax = plt.gca()
+                self.canvas = ax.figure.canvas
+                self.canvas.draw()
+                tbar = self.canvas.toolbar
+                self.button_roiSelect = QtWidgets.QPushButton()
+                self.button_roiSelect.setToolTip("Select ROI")
+                icon1 = QtGui.QPixmap('resources/pencil.png')
+                self.button_roiSelect.setIcon(QtGui.QIcon(icon1))
+                self.button_roiSelect.clicked.connect(self.selectROI)
+                self.button_roi = QtWidgets.QPushButton()
+                self.button_roi.setToolTip("Save ROI")
+                icon2 = QtGui.QPixmap('resources/chart.png')
+                self.button_roi.setIcon(QtGui.QIcon(icon2))
+                self.button_roi.clicked.connect(self.saveROI)
+                tbar.addWidget(self.button_roiSelect)
+                tbar.addWidget(self.button_roi)
+                self.canvas.show()
+                self.lasso = LassoSelector(ax, self.onselect)
+                #self.lasso.active = False #initial
                 plt.show()
            
             #create total plot
@@ -330,12 +355,37 @@ class MyApp(QtWidgets.QMainWindow):
              #   self.updateStatus("Plotly Plot saved to " + unique_url)
            # plt.close()
                      
-           
-            
+    def selectROI(self,event):
+        if (self.lasso.active):
+            self.lasso.active=False
+        else:
+            self.lasso.active=True
+
+    def saveROI(self,event):
+        if (self.poly):
+            print('Polygon coords:',self.poly)
+            msg = self.tracker.plot_region(self.poly.xy)
+            self.updateStatus(msg)
+
+    def onselect(self,verts):
+        print(verts)
+        #roi = path.Path(verts)
+        self.poly = Polygon(verts, animated=True)
+        ax = plt.gca()
+        x, y = zip(*self.poly.xy)
+        line = Line2D(x, y, marker='o', markerfacecolor='r', animated=True)
+        ax.add_line(line)
+        plt.show()
+
     def updateStatus(self, txtout):
         statusoutput = self.ui.listOutput.model()
         status = QtGui.QStandardItem(txtout)
         statusoutput.appendRow(status)
+
+    def clearStatus(self):
+        statusoutput = self.ui.listOutput.model()
+        statusoutput.clear()
+        self.tracker = None
 
     def helpdialog(self):
         dialog = QtWidgets.QDialog()
