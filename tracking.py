@@ -38,8 +38,8 @@ import collections
 
 import numpy as np
 import matplotlib
-
 matplotlib.use("Qt5Agg")
+import matplotlib.backends.backend_qt5agg
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, Point
 from trackerplots.contourplot import ContourPlot
