@@ -58,3 +58,6 @@ target/
 
 # Edit backups:
 *~
+
+# PyCharm
+.idea/

@@ -88,11 +88,12 @@ class Coord:
 
     def get_headers(self):
         return self.fieldnames
-        ''' Determines if x,y coordinates have changed
-    Args: (x,y) and (x1,y1) - 2 sets of coordinates
-           f - number of decimal places for rounding coord values (default is 1)
-    Returns 1 if changed (moved) or 0 if not changed
-   '''
+
+    ''' Determines if x,y coordinates have changed
+        Args: (x,y) and (x1,y1) - 2 sets of coordinates
+               f - number of decimal places for rounding coord values (default is 1)
+        Returns 1 if changed (moved) or 0 if not changed
+       '''
     def has_moved(self):
         if((self.x,self.y) == (0,0) or (self.xcache,self.ycache) ==(0,0)):
             return 0

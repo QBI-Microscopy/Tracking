@@ -35,15 +35,12 @@ homedir = expanduser("~")
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QSettings
 from tracking import Tracker
+from trackerplots.trackerplot import TrackerPlot
+from trackerplots.contourplot import ContourPlot
 import matplotlib.pyplot as plt
-from matplotlib.widgets import LassoSelector
-from matplotlib.patches import Polygon
-from matplotlib.lines import Line2D
-
-##Removed in compiled version (unable to locate plotly\\graph_reference\\graph_objs_meta.json)
-#import plotly.plotly as py
-#import plotly.tools as tls
-#from plotly.graph_objs import *
+import numpy as np
+from numpy import ogrid
+import scipy.interpolate
 
 # create a progressBar while running plotter
 class progress(QtWidgets.QDialog):
@@ -95,10 +92,11 @@ class MyApp(QtWidgets.QMainWindow):
         self.ui.txtInput.setText(self.settings.value('datafile', '.'))
         self.ui.txtOutputdir.setText(self.settings.value('outputdir', '.'))
         self.ui.doubleSpinBox.setValue(float(self.settings.value('arrow', '0.20')))
+        self.ui.spinContours.setValue(float(self.settings.value('contours', '0')))
+        self.ui.spinDec.setValue(float(self.settings.value('decimal', '1')))
         if (len(self.ui.txtInput.text()) > 5 and len(self.ui.txtOutputdir.text()) > 5 and len(self.ui.txtOutputfile.text()) > 5):
                 self.ui.btnRunScript.setEnabled(True)
-        ##TEMPORARY: Disabled Plotly due to error with build
-        self.ui.checkBoxPlotly.setEnabled(False)
+
         #Set actions
         self.ui.btnRunScript.clicked.connect(self.runscript)
         self.ui.btnFileBrowser.clicked.connect(self.popupInput)
@@ -300,8 +298,10 @@ class MyApp(QtWidgets.QMainWindow):
                 self.progress.update(i)
                 QtWidgets.QApplication.processEvents()
                 msg = tracker.plottrack(trak, totalplots, arrowwidth,pngplots)
-                self.updateStatus(msg)
+                #self.updateStatus(msg)
         self.progress.stop()
+        msg = "Track plots done"
+        self.updateStatus(msg)
         #create total plot - Matlab
         if (totalplots > 0):
             self.fig = plt.figure(tracker.alltracks + 1)
@@ -309,9 +309,8 @@ class MyApp(QtWidgets.QMainWindow):
             mytitle = "All " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
             lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta,units='x', pivot='tip', width=arrowwidth)
             plt.setp(lines, antialiased=True)
-            plt.xlabel('x')
-            plt.ylabel('y')
             plt.title(mytitle)
+
             #save to file
             if (pngplots):
                 filename = tracker.outputdir + "Tracks_" + str(plotrange[0]) + "to" + str(plotrange[-1]) + ".png"
@@ -319,63 +318,32 @@ class MyApp(QtWidgets.QMainWindow):
                 self.updateStatus("Total Plot saved to " + filename)
             
             if (self.ui.checkBoxMatlab.isChecked()):
-                #plt.show()
-                ax = plt.gca()
-                self.canvas = ax.figure.canvas
-                self.canvas.draw()
-                tbar = self.canvas.toolbar
-                self.button_roiSelect = QtWidgets.QPushButton()
-                self.button_roiSelect.setToolTip("Select ROI")
-                icon1 = QtGui.QPixmap('resources/pencil.png')
-                self.button_roiSelect.setIcon(QtGui.QIcon(icon1))
-                self.button_roiSelect.clicked.connect(self.selectROI)
-                self.button_roi = QtWidgets.QPushButton()
-                self.button_roi.setToolTip("Save ROI")
-                icon2 = QtGui.QPixmap('resources/chart.png')
-                self.button_roi.setIcon(QtGui.QIcon(icon2))
-                self.button_roi.clicked.connect(self.saveROI)
-                tbar.addWidget(self.button_roiSelect)
-                tbar.addWidget(self.button_roi)
-                self.canvas.show()
-                self.lasso = LassoSelector(ax, self.onselect)
-                #self.lasso.active = False #initial
+                self.tp = TrackerPlot()
+                #overwrite saveROI action
+                self.tp.roiAction.triggered.connect(self.plotROI)
+                if self.ui.spinContours.value() > 0:
+                    intervals = self.ui.spinContours.value()
+                    msg = "Plotting Contour overlay with %d intervals ... please wait" % intervals
+                    self.updateStatus(msg)
+                    #Add contours
+                    tplot = ContourPlot()
+                    tplot.loadarrays(tracker.allx,tracker.ally,tracker.allrho)
+                    tplot.intervals = intervals
+                    tplot.showtitle = False
+                    tplot.linesonly = True
+                    tplot.newfig = False
+                    tplot.contour_region(mytitle)
+                    self.updateStatus("... done")
                 plt.show()
-           
-            #create total plot
-            #####Plotly needs an account - follow instructions: https://plot.ly/python/getting-started/
-            
-            ## TEMPORARY: REMOVED DUE TO ERROR WITH BUILD
-            #if (self.ui.checkBoxPlotly.isChecked()):
-             #   plotly_fig = tls.mpl_to_plotly(fig)
-                #TODO: Need to create meshgrids from sorted data
-                #quiver = tls.TraceFactory.create_quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta)
-                #data = Data([quiver])
-                #plotly_fig = Figure(data=data)
-             #   unique_url = py.plot(plotly_fig, filename = mytitle)
-             #   self.updateStatus("Plotly Plot saved to " + unique_url)
-           # plt.close()
-                     
-    def selectROI(self,event):
-        if (self.lasso.active):
-            self.lasso.active=False
-        else:
-            self.lasso.active=True
 
-    def saveROI(self,event):
-        if (self.poly):
-            print('Polygon coords:',self.poly)
-            msg = self.tracker.plot_region(self.poly.xy)
+    ''' Overwritten event for TrackerPlot.roiAction button
+    '''
+    def plotROI(self,event):
+        if (self.tp.poly):
+            print('Polygon coords:',self.tp.poly)
+            msg = self.tracker.plot_region(self.tp.poly.xy)
             self.updateStatus(msg)
 
-    def onselect(self,verts):
-        print(verts)
-        #roi = path.Path(verts)
-        self.poly = Polygon(verts, animated=True)
-        ax = plt.gca()
-        x, y = zip(*self.poly.xy)
-        line = Line2D(x, y, marker='o', markerfacecolor='r', animated=True)
-        ax.add_line(line)
-        plt.show()
 
     def updateStatus(self, txtout):
         statusoutput = self.ui.listOutput.model()
@@ -400,6 +368,8 @@ class MyApp(QtWidgets.QMainWindow):
             self.settings.setValue("size", self.size())
             self.settings.setValue("pos", self.pos())
             self.settings.setValue("arrow", self.ui.doubleSpinBox.value())
+            self.settings.setValue("contours", self.ui.spinContours.value())
+            self.settings.setValue("decimal", self.ui.spinDec.value())
             self.progress.close()
             if (self.fig is not None):
                 plt.close(self.fig)

@@ -13,17 +13,18 @@ matplotlib.use("Qt5Agg")
 import matplotlib.backends.backend_qt5agg
 import matplotlib.pyplot as plt
 import scipy.interpolate
+import plotly.plotly as py
+import plotly.tools as tls
+from plotly.graph_objs import *
 
-class ContourPlot:
+class PlotlyTracker:
 
     def __init__(self):
         self.initlists()
         self.inputheaders = ['Track', 'Frame','x','y','roundx', 'roundy',
          'dx', 'dy','rho', 'theta', 'intensity','framecount']
         self.xylist = dict()
-        self.linesonly = False
-        self.showtitle = True
-        self.newfig = True
+
 
     def initlists(self):
         #initialize
@@ -58,54 +59,33 @@ class ContourPlot:
         self.z.append(z)
         self.t.append(t)
 
-    def loadarrays(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
+    def quiver_region(self,fname='test'):
+        plotly_fig = tls.mpl_to_plotly(fig)
 
-    def contour_region(self,fname='test'):
-        print("Plotting contour plot")
-        MAX = 1000000
-        intervals = self.intervals
-        totalpoints = len(self.x)
-        if (len(self.name)>0):
-            fname = self.name
+        x = self.x
+        y = self.y
+        z = self.z
 
-        if (totalpoints > 0 & totalpoints < MAX):
-            if self.newfig:
-                fig = plt.figure()
-            mytitle = "Speed heatmap: " + fname + "(" + str(totalpoints) + " points)"
-            print(mytitle)
-            x = self.x
-            y = self.y
-            z = self.z
-            #t = self.t
-            #margin = 10 * (min(x)/100)
-            # Set up a regular grid of interpolation points
-            xi, yi = np.linspace(min(x), max(x), intervals), np.linspace(min(y), max(y), intervals)
-            xi, yi = np.meshgrid(xi, yi)
+        # Set up a regular grid of interpolation points
+        xi, yi = np.linspace(min(x), max(x), intervals), np.linspace(min(y), max(y), intervals)
+        xi, yi = np.meshgrid(xi, yi)
 
-            # Interpolate
-            rbf = scipy.interpolate.Rbf(x, y, z, function='linear')
-            zi = rbf(xi, yi)
-            #fig = plt.figure()
-            plt.contour(xi,yi,zi)
-            if not self.linesonly:
-                plt.imshow(zi, vmin=min(z), vmax=max(z), origin='lower', extent=[min(x), max(x), min(y), max(y)])
-                plt.scatter(x, y, c=z)
-            plt.colorbar()
-            plt.xlabel('x')
-            plt.ylabel('y')
-            if self.showtitle:
-                plt.title(mytitle)
-            plt.show()
-        else:
-            print("No data to plot")
+        # Interpolate
+        rbf = scipy.interpolate.Rbf(x, y, z, function='linear')
+        zi = rbf(xi, yi)
+        quiver = tls.TraceFactory.create_quiver()
+        data = Data([quiver])
+        plotly_fig = Figure(data=data)
+        unique_url = py.plot(plotly_fig, filename = self.name)
+        msg =("Plotly Plot saved to " + unique_url)
+
+        plt.close()
+        return msg
 
 
 ## Main
 if __name__ == "__main__":
-
+#####Plotly needs an account - follow instructions: https://plot.ly/python/getting-started/
     print(inspect.getfile(inspect.currentframe())) # script filename (usually with path)
     defaultSrcPath = os.getcwd() # current directory
     defaultDataPath = 'sampledata'
@@ -120,7 +100,8 @@ if __name__ == "__main__":
    # if (not file_check(args.filename)):
    #     sys.exit()
 
-    tplot = ContourPlot()
+    tplot = PlotlyTracker()
     tplot.load(args.filename)
     print("Loaded: ", len(tplot.xylist))
-    tplot.contour_region()
+    msg = tplot.quiver_region()
+    print(msg)
