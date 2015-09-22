@@ -330,6 +330,12 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>20</height>
+     </size>
+    </property>
     <property name="toolTip">
      <string>Popup each plot as a Matlab plot (limited range recommended)</string>
     </property>
@@ -495,11 +501,17 @@
     <widget class="QDoubleSpinBox" name="doubleSpinBox">
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>400</x>
        <y>60</y>
        <width>62</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>22</height>
+      </size>
      </property>
      <property name="toolTip">
       <string>Default is 0.2</string>
@@ -522,9 +534,15 @@
       <rect>
        <x>310</x>
        <y>60</y>
-       <width>51</width>
+       <width>81</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="text">
       <string>Arrow size</string>
@@ -553,11 +571,17 @@
     <widget class="QCheckBox" name="checkPNG">
      <property name="geometry">
       <rect>
-       <x>450</x>
+       <x>480</x>
        <y>60</y>
-       <width>89</width>
+       <width>111</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
      </property>
      <property name="toolTip">
       <string>Save individual plots as PNG</string>
@@ -569,11 +593,17 @@
     <widget class="QSpinBox" name="spinContours">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>250</x>
        <y>60</y>
        <width>51</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>22</height>
+      </size>
      </property>
      <property name="maximum">
       <number>1000</number>
@@ -586,10 +616,16 @@
      <property name="geometry">
       <rect>
        <x>190</x>
-       <y>63</y>
-       <width>47</width>
-       <height>13</height>
+       <y>60</y>
+       <width>61</width>
+       <height>20</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>16</height>
+      </size>
      </property>
      <property name="text">
       <string>Contours</string>
