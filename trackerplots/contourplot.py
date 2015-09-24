@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use("Qt5Agg")
 import matplotlib.backends.backend_qt5agg
 import matplotlib.pyplot as plt
-import scipy.interpolate
+from scipy import interpolate
 
 class ContourPlot:
 
@@ -86,8 +86,9 @@ class ContourPlot:
             xi, yi = np.meshgrid(xi, yi)
 
             # Interpolate
-            rbf = scipy.interpolate.Rbf(x, y, z, function='linear')
+            rbf = interpolate.Rbf(x, y, z, function='linear')
             zi = rbf(xi, yi)
+
             #fig = plt.figure()
             plt.contour(xi,yi,zi)
             if not self.linesonly:

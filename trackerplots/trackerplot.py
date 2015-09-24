@@ -10,8 +10,6 @@ import matplotlib.mlab as mlab
 from matplotlib.widgets import LassoSelector
 from matplotlib.patches import Polygon
 from matplotlib.lines import Line2D
-from trackerplots import contourplot
-from matplotlib.path import Path
 
 
 class TrackerPlot:

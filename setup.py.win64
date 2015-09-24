@@ -11,7 +11,6 @@ application_title = "QBI Meunier Tracker" #what you want to application to be ca
 main_python_file = "trackerapp.py" #the name of the python file you use to run the program
 
 import sys
-
 from cx_Freeze import setup, Executable
 
 base = None
@@ -19,13 +18,16 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 build_exe_options = {
-    "includes" : ["sip", "PyQt5", "matplotlib", "plotly"], 
-    "include_files" : ["tracker.ui", "tracker_progress.ui", "tracker_help.ui", "resources/48px-Go-next.svg.png","resources/Help-browser.svg.png"],    "include_msvcr" : 1 
+    'includes' : ['sip', 'PyQt5'],
+    'packages' : ['shapely'],
+    'include_files' : ['tracker.ui', 'tracker_progress.ui', 'tracker_help.ui', 'resources/',('D:\\Programs\\Python3\\Lib\\site-packages\\scipy\\special\\_ufuncs.pyd',
+    '_ufuncs.pyd')],
+    'include_msvcr' : 1
    }
 # [Bad fix but only thing that works] NB To add Shortcut working dir - change cx_freeze/windist.py Line 61 : last None - > "TARGETDIR" 
 setup(
         name = application_title,
-        version = "1.1",
+        version = "2.2",
         description = "Tracker script with GUI",
         author="Liz Cooper-Williams, QBI",
         author_email="e.cooperwilliams@uq.edu.au",

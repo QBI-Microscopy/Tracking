@@ -4,7 +4,7 @@
     **************************************************************
     Description: This script was developed for Andreas in the Meunier Lab at QBI.  It analyses particle tracking information and produces plots.
     
-    Requirements: Python3, PyQt5, matplotlib, numpy, plotly
+    Requirements: Python3, PyQt5, matplotlib, numpy, plotly, scipy
     UI files: created in Qt Designer, loaded dynamically with uic
     Input: CSV Output file from Tracking program (Metamorph)
     Output: CSV file with processed data, PNG files if Plotting
@@ -20,10 +20,6 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
     '''
 __author__ = "Liz Cooper-Williams (QBI)"
 __date__ = "$15/06/2015 11:03:33 AM$"
@@ -38,9 +34,6 @@ from tracking import Tracker
 from trackerplots.trackerplot import TrackerPlot
 from trackerplots.contourplot import ContourPlot
 import matplotlib.pyplot as plt
-import numpy as np
-from numpy import ogrid
-import scipy.interpolate
 
 # create a progressBar while running plotter
 class progress(QtWidgets.QDialog):
