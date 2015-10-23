@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
-    <height>560</height>
+    <width>730</width>
+    <height>760</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>670</width>
-    <height>560</height>
+    <width>730</width>
+    <height>760</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -117,34 +117,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QSpinBox" name="spinDec">
-    <property name="geometry">
-     <rect>
-      <x>453</x>
-      <y>133</y>
-      <width>50</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="sizeIncrement">
-     <size>
-      <width>3</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="toolTipDuration">
-     <number>-1</number>
-    </property>
-    <property name="maximum">
-     <number>20</number>
-    </property>
-    <property name="singleStep">
-     <number>1</number>
-    </property>
-    <property name="value">
-     <number>1</number>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
@@ -156,19 +128,6 @@
     </property>
     <property name="text">
      <string>Input File</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>346</x>
-      <y>140</y>
-      <width>101</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Decimal Places</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
@@ -223,10 +182,10 @@
    <widget class="QScrollArea" name="scrollOutput">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>270</y>
-      <width>521</width>
-      <height>231</height>
+      <x>100</x>
+      <y>660</y>
+      <width>621</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="widgetResizable">
@@ -237,8 +196,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>519</width>
-       <height>229</height>
+       <width>619</width>
+       <height>59</height>
       </rect>
      </property>
      <widget class="QListView" name="listOutput">
@@ -246,8 +205,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>521</width>
-        <height>231</height>
+        <width>621</width>
+        <height>59</height>
        </rect>
       </property>
       <property name="editTriggers">
@@ -264,7 +223,7 @@
      <rect>
       <x>130</x>
       <y>133</y>
-      <width>171</width>
+      <width>311</width>
       <height>31</height>
      </rect>
     </property>
@@ -285,23 +244,10 @@
      <string>Output Filename</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>280</y>
-      <width>101</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Output Pane</string>
-    </property>
-   </widget>
    <widget class="QToolButton" name="toolButtonHelp">
     <property name="geometry">
      <rect>
-      <x>606</x>
+      <x>660</x>
       <y>10</y>
       <width>51</width>
       <height>41</height>
@@ -325,7 +271,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>230</y>
+      <y>225</y>
       <width>71</width>
       <height>20</height>
      </rect>
@@ -343,7 +289,7 @@
      <number>5</number>
     </property>
     <property name="text">
-     <string>Matlab</string>
+     <string>Total Plot</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_11">
@@ -367,8 +313,8 @@
      <rect>
       <x>10</x>
       <y>170</y>
-      <width>651</width>
-      <height>91</height>
+      <width>711</width>
+      <height>121</height>
      </rect>
     </property>
     <property name="autoFillBackground">
@@ -381,108 +327,20 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>24</y>
+       <y>20</y>
        <width>70</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>All Plots</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="spinPlotTo">
-     <property name="geometry">
-      <rect>
-       <x>430</x>
-       <y>20</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="sizeIncrement">
-      <size>
-       <width>3</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="toolTipDuration">
-      <number>-1</number>
-     </property>
-     <property name="minimum">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <number>10000</number>
-     </property>
-     <property name="singleStep">
-      <number>1</number>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_9">
-     <property name="geometry">
-      <rect>
-       <x>400</x>
-       <y>24</y>
-       <width>21</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>To</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="spinPlotFrom">
-     <property name="geometry">
-      <rect>
-       <x>290</x>
-       <y>20</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="sizeIncrement">
-      <size>
-       <width>3</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="toolTipDuration">
-      <number>-1</number>
-     </property>
-     <property name="minimum">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <number>10000</number>
-     </property>
-     <property name="singleStep">
-      <number>1</number>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_8">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>27</y>
-       <width>41</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>From</string>
+      <string>All Tracks</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_7">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>24</y>
+       <y>22</y>
        <width>59</width>
        <height>16</height>
       </rect>
@@ -498,61 +356,11 @@
       <string>Range</string>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox">
-     <property name="geometry">
-      <rect>
-       <x>400</x>
-       <y>60</y>
-       <width>62</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>22</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>Default is 0.2</string>
-     </property>
-     <property name="toolTipDuration">
-      <number>5</number>
-     </property>
-     <property name="maximum">
-      <double>0.500000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.010000000000000</double>
-     </property>
-     <property name="value">
-      <double>0.200000000000000</double>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_12">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>60</y>
-       <width>81</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Arrow size</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>60</y>
+       <y>56</y>
        <width>59</width>
        <height>16</height>
       </rect>
@@ -571,8 +379,8 @@
     <widget class="QCheckBox" name="checkPNG">
      <property name="geometry">
       <rect>
-       <x>480</x>
-       <y>60</y>
+       <x>120</x>
+       <y>90</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -587,58 +395,365 @@
       <string>Save individual plots as PNG</string>
      </property>
      <property name="text">
-      <string>Save all PNG</string>
+      <string>Save as PNG</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="spinContours">
+    <widget class="QLabel" name="label_14">
      <property name="geometry">
       <rect>
-       <x>250</x>
-       <y>60</y>
-       <width>51</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>22</height>
-      </size>
-     </property>
-     <property name="maximum">
-      <number>1000</number>
-     </property>
-     <property name="singleStep">
-      <number>100</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_13">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>60</y>
-       <width>61</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
+       <x>20</x>
+       <y>90</y>
+       <width>81</width>
        <height>16</height>
-      </size>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
-      <string>Contours</string>
+      <string>Tracks</string>
      </property>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>80</y>
+       <width>421</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Decimal Places</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinDec">
+        <property name="sizeIncrement">
+         <size>
+          <width>3</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string extracomment="For rounding coordinates before averaging"/>
+        </property>
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
+        <property name="maximum">
+         <number>20</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_15">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Min number points</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinMinpoints">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string extracomment="Include tracks with minimum number of timepoints"/>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::PlusMinus</enum>
+        </property>
+        <property name="specialValueText">
+         <string/>
+        </property>
+        <property name="correctionMode">
+         <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_16">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Min track length</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="doubleSpinMinlength">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string extracomment="Include tracks with minimum total track length"/>
+        </property>
+        <property name="maximum">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>50</y>
+       <width>218</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_13">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Contours</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinContours">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="singleStep">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_12">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Arrow size</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="spinArrowsize">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Default is 0.2</string>
+        </property>
+        <property name="toolTipDuration">
+         <number>5</number>
+        </property>
+        <property name="maximum">
+         <double>0.500000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.200000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>20</y>
+       <width>173</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>From</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinPlotFrom">
+        <property name="sizeIncrement">
+         <size>
+          <width>3</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>To</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinPlotTo">
+        <property name="sizeIncrement">
+         <size>
+          <width>3</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QPushButton" name="btnClear">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>300</y>
+      <y>680</y>
       <width>81</width>
-      <height>51</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
@@ -655,32 +770,189 @@
      </size>
     </property>
    </widget>
+   <widget class="QGraphicsView" name="graphicsView1">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>350</y>
+      <width>350</width>
+      <height>270</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="graphicsView2">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>350</y>
+      <width>350</width>
+      <height>270</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBoxTracks">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>290</y>
+      <width>711</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>Review Tracks</string>
+    </property>
+    <widget class="QPushButton" name="btnReviewBack">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>20</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Back</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnReviewNext">
+     <property name="geometry">
+      <rect>
+       <x>560</x>
+       <y>20</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Next</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="checkExclude">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>20</y>
+       <width>70</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Exclude</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelTotalTracks">
+     <property name="geometry">
+      <rect>
+       <x>153</x>
+       <y>16</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinCurrentTrack">
+     <property name="geometry">
+      <rect>
+       <x>91</x>
+       <y>11</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>17</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Track Number</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QSpinBox" name="spinFramerate">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>60</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="value">
+     <number>25</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_17">
+    <property name="geometry">
+     <rect>
+      <x>536</x>
+      <y>60</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Frame rate (fps)</string>
+    </property>
+   </widget>
    <zorder>groupPlots</zorder>
    <zorder>label</zorder>
    <zorder>btnFileBrowser</zorder>
    <zorder>btnRunScript</zorder>
    <zorder>txtInput</zorder>
-   <zorder>spinDec</zorder>
    <zorder>label_2</zorder>
-   <zorder>label_3</zorder>
    <zorder>label_4</zorder>
    <zorder>btnFolderBrowser</zorder>
    <zorder>txtOutputdir</zorder>
    <zorder>scrollOutput</zorder>
    <zorder>txtOutputfile</zorder>
    <zorder>label_5</zorder>
-   <zorder>label_6</zorder>
    <zorder>toolButtonHelp</zorder>
    <zorder>checkBoxMatlab</zorder>
    <zorder>label_11</zorder>
    <zorder>btnClear</zorder>
+   <zorder>graphicsView1</zorder>
+   <zorder>graphicsView2</zorder>
+   <zorder>groupBoxTracks</zorder>
+   <zorder>spinCurrentTrack</zorder>
+   <zorder>labelTotalTracks</zorder>
+   <zorder>btnReviewBack</zorder>
+   <zorder>spinFramerate</zorder>
+   <zorder>label_17</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>670</width>
+     <width>730</width>
      <height>18</height>
     </rect>
    </property>

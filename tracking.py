@@ -313,6 +313,7 @@ class Tracker:
                     myco = self.coordlist[co][0]
                     myco.rho = myco.getpolar_rho(myco.dx,myco.dy)
                     myco.theta = myco.getpolar_theta(myco.dx,myco.dy)
+
                 writer.writerow(myco.get_rowoutput(self.numdecimal))
                 if (myco.track not in self.plotter):
                     self.plotter.update({myco.track:[]})
@@ -320,7 +321,7 @@ class Tracker:
         msg = "Completed"
         return msg
     
-    def plottrack(self, trak, totalplots=0, arrow=0.2,png=1):
+    def plottrack(self, trak, totalplots=0, arrow=0.1,png=1):
         if (trak in self.plotter):
             
             #create a plot of a track
@@ -332,7 +333,10 @@ class Tracker:
             mytitle = "Track: " + str(trak)
             print(mytitle)
             msg = mytitle
-            for tn in self.plotter[trak]:
+            #sort track frames
+            tracklist = sorted(self.plotter[trak], key=lambda t: t.frame)
+
+            for tn in tracklist:
                 x.append(tn.x)
                 y.append(tn.y)
                 rho.append(tn.getpolar_rho(tn.dx,tn.dy))
@@ -347,11 +351,15 @@ class Tracker:
                 self.alltracks += 1
             if (png):
                 fig = plt.figure(trak)
-                lines = plt.quiver(x,y,rho,theta,units='x',pivot='tip',width=arrow)
-                plt.setp(lines, color='b', antialiased=True)
                 plt.xlabel('x')
                 plt.ylabel('y')
                 plt.title(mytitle)
+
+                lines = plt.quiver(x,y,rho,theta)
+                plt.setp(lines, color='b', antialiased=True)
+
+                #plt.plot(x,y,linewidth=arrow)
+
                 #Write to file
                 filename = plotdir + "Track_" + str(trak) + ".png"
                 fig.savefig(filename, dpi=300, orientation='landscape', format='png')

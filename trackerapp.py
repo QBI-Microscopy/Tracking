@@ -33,7 +33,12 @@ from PyQt5.QtCore import QSettings
 from tracking import Tracker
 from trackerplots.trackerplot import TrackerPlot
 from trackerplots.contourplot import ContourPlot
+import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import (
+    FigureCanvasQTAgg as FigureCanvas,
+    NavigationToolbar2QT as NavigationToolbar)
 
 # create a progressBar while running plotter
 class progress(QtWidgets.QDialog):
@@ -84,24 +89,40 @@ class MyApp(QtWidgets.QMainWindow):
         self.move(self.settings.value('pos', QtCore.QPoint(50, 50)))
         self.ui.txtInput.setText(self.settings.value('datafile', '.'))
         self.ui.txtOutputdir.setText(self.settings.value('outputdir', '.'))
-        self.ui.doubleSpinBox.setValue(float(self.settings.value('arrow', '0.20')))
+        self.ui.spinArrowsize.setValue(float(self.settings.value('arrow', '0.20')))
         self.ui.spinContours.setValue(float(self.settings.value('contours', '0')))
         self.ui.spinDec.setValue(float(self.settings.value('decimal', '1')))
+        self.ui.spinFramerate.setValue(float(self.settings.value('framerate', '1')))
         if (len(self.ui.txtInput.text()) > 5 and len(self.ui.txtOutputdir.text()) > 5 and len(self.ui.txtOutputfile.text()) > 5):
                 self.ui.btnRunScript.setEnabled(True)
-
+        #Set Graphics views
+        self.scene=QtWidgets.QGraphicsScene(0,0,self.ui.graphicsView1.width()-2,self.ui.graphicsView1.height()-2)
+        self.ui.graphicsView1.setScene(self.scene)
+        self.scene2=QtWidgets.QGraphicsScene(0,0,self.ui.graphicsView2.width()-2,self.ui.graphicsView2.height()-2)
+        self.ui.graphicsView2.setScene(self.scene2)
+        # populate fills the scene with interesting stuff.
+        #self.scene.setSceneRect(QtCore.QRectF(0, 0, 260, 200))
+        #self.item = QtWidgets.QGraphicsEllipseItem(0, 0, 60, 40)
+        #self.scene.addItem(self.item)
         #Set actions
         self.ui.btnRunScript.clicked.connect(self.runscript)
         self.ui.btnFileBrowser.clicked.connect(self.popupInput)
         self.ui.btnFolderBrowser.clicked.connect(self.popupOutput)
         self.ui.btnClear.clicked.connect(self.clearfields)
         self.ui.toolButtonHelp.clicked.connect(self.helpdialog)
+        self.ui.btnReviewBack.clicked.connect(self.loadTrack,-1)
+        self.ui.btnReviewNext.clicked.connect(self.loadTrack,1)
+        self.ui.checkExclude.clicked.connect(self.excludeTrack)
+        self.ui.spinCurrentTrack.valueChanged.connect(self.loadTrack,self.ui.spinCurrentTrack.value())
+        self.ui.groupBoxTracks.setEnabled(False)
         #Setup ProgressBar
         self.progress = progress(self)
         self.finished = False
         #Allow save fig
         self.fig = None
         self.tracker = None
+        self.p1 = None
+        self.p2 = None
 
     def loadparams(self):
         paramslist = QtGui.QStandardItemModel(self.ui.listOutput)
@@ -172,19 +193,9 @@ class MyApp(QtWidgets.QMainWindow):
 
     def clearfields(self):
         for widget in self.ui.centralwidget.children():
-            # if isinstance(widget, QtWidgets.QLineEdit):
-            #     widget.setText('')
-            # if isinstance(widget, QtWidgets.QCheckBox):
-            #     widget.setChecked(False)
             if isinstance(widget, QtWidgets.QScrollArea):
                 self.clearStatus()
-                #widget.clear()
-                #for wc in widget.children():
-                #    if isinstance(wc, QtWidgets.QListView):
-                 #       wc.clear()
 
-            # if isinstance(widget, QtWidgets.QSpinBox):
-            #     widget.setValue(widget.minimum())
 
     def popupInput(self):
         browser = QtWidgets.QFileDialog(self)
@@ -281,8 +292,8 @@ class MyApp(QtWidgets.QMainWindow):
 
         #run plots
         tracker.init_allplots()
-        totalplots = (self.ui.checkBoxMatlab.isChecked() or self.ui.checkBoxPlotly.isChecked())
-        arrowwidth = self.ui.doubleSpinBox.value()
+        totalplots = self.ui.checkBoxMatlab.isChecked()
+        arrowwidth = self.ui.spinArrowsize.value()
         pngplots = self.ui.checkPNG.isChecked()
         i = 0
         for trak in plotrange:
@@ -300,9 +311,11 @@ class MyApp(QtWidgets.QMainWindow):
             self.fig = plt.figure(tracker.alltracks + 1)
 
             mytitle = "All " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
-            lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta,units='x', pivot='tip', width=arrowwidth)
+            lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta,units='x', pivot='tip',
+                               width=arrowwidth)
             plt.setp(lines, antialiased=True)
             plt.title(mytitle)
+
 
             #save to file
             if (pngplots):
@@ -328,7 +341,15 @@ class MyApp(QtWidgets.QMainWindow):
                     tplot.contour_region(mytitle)
                     self.updateStatus("... done")
                 plt.show()
-
+            #load in graphicsview
+            #self.addmpl(self.fig)
+            self.ui.groupBoxTracks.setEnabled(True)
+            self.current  = 1
+            self.total = tracker.alltracks
+            self.excluded = []
+            self.ui.spinCurrentTrack.setValue(self.current)
+            self.ui.spinCurrentTrack.setMaximum(self.total)
+            self.ui.labelTotalTracks.setText(" of " + str(self.total))
     ''' Overwritten event for TrackerPlot.roiAction button
     '''
     def plotROI(self,event):
@@ -337,6 +358,73 @@ class MyApp(QtWidgets.QMainWindow):
             msg = self.tracker.plot_region(self.tp.poly.xy)
             self.updateStatus(msg)
 
+    def showTrackXY(self, track,x,y):
+        #Clean up previous
+        if (self.p1 is not None):
+            plt.close(self.p1)
+
+        fig = plt.figure(track,dpi=45,frameon=False)
+        plt.suptitle("Track " + str(track) + " (" + str(len(x)) + " points, length=)")
+        plt.xlabel('x')
+        plt.ylabel('y')
+        self.p1 = fig
+        plt.plot(x,y)
+        self.canvas = FigureCanvas(fig)
+        self.scene.addWidget(self.canvas)
+        self.canvas.draw()
+
+    def showMSD(self,track,t,sd):
+        if (self.p2 is not None):
+            plt.close(self.p2)
+
+        fig = plt.figure(dpi=45,frameon=False)
+        plt.suptitle("MSD for track "+ str(track))
+        plt.xlabel('time (s)')
+        plt.ylabel('(Cumulative Square Displacement(CSD)')
+        #convert frame numbers to time
+        t0 = t[0]
+        framerate = round(self.ui.spinFramerate.value() / 60,2)
+
+        if (t0 > 1):
+            tf = [x-t0 for x in t]
+        else:
+            tf = t
+        t1 = [x * framerate for x in tf]
+        #calculate MSD - cumulative SD ?check
+        msd = 0
+        csd = []
+        for s in sd:
+            msd = s + msd
+            csd.append(msd)
+
+        plt.plot(t1,csd)
+        self.canvas2 = FigureCanvas(fig)
+        self.scene2.addWidget(self.canvas2)
+        self.canvas2.draw()
+        self.p2 = fig
+
+    def loadTrack(self,track):
+        #Sort by timeframe
+        tracklist = sorted(self.tracker.plotter[track], key=lambda t: t.frame)
+        x = []
+        y = []
+        sd = []
+        frames = []
+        for tn in tracklist:
+            x.append(tn.x)
+            y.append(tn.y)
+            frames.append(tn.frame)
+            sd.append(tn.dx**2 + tn.dy**2)
+        #Display plots
+        self.showTrackXY(track,x,y)
+        self.showMSD(track,frames,sd)
+        #Update track review
+        self.current = track
+        self.ui.txtCurrent = track
+
+
+    def excludeTrack(self):
+        self.excluded.append(self.current)
 
     def updateStatus(self, txtout):
         statusoutput = self.ui.listOutput.model()
@@ -360,9 +448,10 @@ class MyApp(QtWidgets.QMainWindow):
             # Write window size and position to config file
             self.settings.setValue("size", self.size())
             self.settings.setValue("pos", self.pos())
-            self.settings.setValue("arrow", self.ui.doubleSpinBox.value())
+            self.settings.setValue("arrow", self.ui.spinArrowsize.value())
             self.settings.setValue("contours", self.ui.spinContours.value())
             self.settings.setValue("decimal", self.ui.spinDec.value())
+            self.settings.setValue("framerate",self.ui.spinFramerate.value())
             self.progress.close()
             if (self.fig is not None):
                 plt.close(self.fig)
@@ -374,5 +463,5 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = MyApp()
     MainWindow.show()
-    
+
     sys.exit(app.exec_())
