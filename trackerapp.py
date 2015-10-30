@@ -28,6 +28,7 @@ __version__ = 1.0
 import os
 from os.path import expanduser
 homedir = expanduser("~")
+import time
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QSettings
 from tracking import Tracker
@@ -96,22 +97,15 @@ class MyApp(QtWidgets.QMainWindow):
         if (len(self.ui.txtInput.text()) > 5 and len(self.ui.txtOutputdir.text()) > 5 and len(self.ui.txtOutputfile.text()) > 5):
                 self.ui.btnRunScript.setEnabled(True)
         #Set Graphics views
-        self.scene=QtWidgets.QGraphicsScene(0,0,self.ui.graphicsView1.width()-2,self.ui.graphicsView1.height()-2)
-        self.ui.graphicsView1.setScene(self.scene)
-        self.scene2=QtWidgets.QGraphicsScene(0,0,self.ui.graphicsView2.width()-2,self.ui.graphicsView2.height()-2)
-        self.ui.graphicsView2.setScene(self.scene2)
-        # populate fills the scene with interesting stuff.
-        #self.scene.setSceneRect(QtCore.QRectF(0, 0, 260, 200))
-        #self.item = QtWidgets.QGraphicsEllipseItem(0, 0, 60, 40)
-        #self.scene.addItem(self.item)
+        self.initGraphicsViews()
         #Set actions
         self.ui.btnRunScript.clicked.connect(self.runscript)
         self.ui.btnFileBrowser.clicked.connect(self.popupInput)
         self.ui.btnFolderBrowser.clicked.connect(self.popupOutput)
         self.ui.btnClear.clicked.connect(self.clearfields)
         self.ui.toolButtonHelp.clicked.connect(self.helpdialog)
-        self.ui.btnReviewBack.clicked.connect(self.loadTrack,-1)
-        self.ui.btnReviewNext.clicked.connect(self.loadTrack,1)
+        self.ui.btnReviewSave.clicked.connect(self.saveData)
+        self.ui.btnReviewDataset.clicked.connect(self.loadData)
         self.ui.checkExclude.clicked.connect(self.excludeTrack)
         self.ui.spinCurrentTrack.valueChanged.connect(self.loadTrack,self.ui.spinCurrentTrack.value())
         self.ui.groupBoxTracks.setEnabled(False)
@@ -123,6 +117,13 @@ class MyApp(QtWidgets.QMainWindow):
         self.tracker = None
         self.p1 = None
         self.p2 = None
+
+    def initGraphicsViews(self):
+        #Set Graphics views
+        self.scene=QtWidgets.QGraphicsScene(0,0,self.ui.graphicsView1.width()-2,self.ui.graphicsView1.height()-2)
+        self.ui.graphicsView1.setScene(self.scene)
+        self.scene2=QtWidgets.QGraphicsScene(0,0,self.ui.graphicsView2.width()-2,self.ui.graphicsView2.height()-2)
+        self.ui.graphicsView2.setScene(self.scene2)
 
     def loadparams(self):
         paramslist = QtGui.QStandardItemModel(self.ui.listOutput)
@@ -154,6 +155,9 @@ class MyApp(QtWidgets.QMainWindow):
                 "OutputFname" : self.ui.txtOutputfile.text(),
                 "OutputFile": self.ui.txtOutputdir.text() + os.path.sep + self.ui.txtOutputfile.text(),
                 "Decimals" : int(self.ui.spinDec.value()),
+                "Minpoints" : int(self.ui.spinMinpoints.value()),
+                "Minlength" : float(self.ui.spinMinlength.value()),
+                "Maxlength" : float(self.ui.spinMaxlength.value()),
                 "Plots" : numplots,
                 "from" : plotfrom,
                 "to" : plotto
@@ -240,22 +244,25 @@ class MyApp(QtWidgets.QMainWindow):
          
         #Generate output file
         tracker.numdecimal = int(params['Decimals'])
+        minpoints = int(params['Minpoints'])
+        minlength = float(params['Minlength'])
+        maxlength = float(params['Maxlength'])
         self.updateStatus("Starting ...")
-        tracker.load_input(params['Input'])
+        tracker.load_input(params['Input'], minpoints,minlength,maxlength)
         self.updateStatus("... Input loaded ...")
         outputfilename = params['OutputFile']
         msg = tracker.write_output(outputfilename)
         self.updateStatus(msg)
                 
-        #Generate plots (if required)
+        #Generate quiver plots (if required)
         if ( "Completed" in msg) and (tracker.counter > 0):
             self.updateStatus("TOTAL ROWS: " + str(tracker.counter))
-            self.updateStatus("TOTAL TRACKS: " + str(len(tracker.plotter)))
+            self.updateStatus("TOTAL TRACKS: " + str(len(tracker.avgplotter)))
             plotnum = int(params['Plots'])
             msgs = []
             #All plots
             if (plotnum < 0):
-                plotnum = len(tracker.plotter)
+                plotnum = len(tracker.avgplotter)
                 params['from'] = 1
                 params['to'] = plotnum + 1
             
@@ -296,12 +303,13 @@ class MyApp(QtWidgets.QMainWindow):
         arrowwidth = self.ui.spinArrowsize.value()
         pngplots = self.ui.checkPNG.isChecked()
         i = 0
-        for trak in plotrange:
+        for n in plotrange:
             if (self.progress.finished == False):
+                trak = self.tracker.getPlotByIndex(n-1)
                 i += 1
                 self.progress.update(i)
                 QtWidgets.QApplication.processEvents()
-                msg = tracker.plottrack(trak, totalplots, arrowwidth,pngplots)
+                msg = tracker.plottrack(trak[0], totalplots, arrowwidth,pngplots)
                 #self.updateStatus(msg)
         self.progress.stop()
         msg = "Track plots done"
@@ -310,7 +318,7 @@ class MyApp(QtWidgets.QMainWindow):
         if (totalplots > 0):
             self.fig = plt.figure(tracker.alltracks + 1)
 
-            mytitle = "All " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
+            mytitle = "Quiver plot (avg) for " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
             lines = plt.quiver(tracker.allx,tracker.ally,tracker.allrho,tracker.alltheta,units='x', pivot='tip',
                                width=arrowwidth)
             plt.setp(lines, antialiased=True)
@@ -342,14 +350,17 @@ class MyApp(QtWidgets.QMainWindow):
                     self.updateStatus("... done")
                 plt.show()
             #load in graphicsview
-            #self.addmpl(self.fig)
-            self.ui.groupBoxTracks.setEnabled(True)
-            self.current  = 1
             self.total = tracker.alltracks
-            self.excluded = []
-            self.ui.spinCurrentTrack.setValue(self.current)
-            self.ui.spinCurrentTrack.setMaximum(self.total)
-            self.ui.labelTotalTracks.setText(" of " + str(self.total))
+            self.initPlotReview()
+
+    def initPlotReview(self):
+        self.ui.groupBoxTracks.setEnabled(True)
+        self.current  = 1
+        self.excluded = []
+        self.ui.spinCurrentTrack.setValue(self.current)
+        self.ui.spinCurrentTrack.setMaximum(self.total)
+        self.ui.labelTotalTracks.setText(" of " + str(self.total))
+
     ''' Overwritten event for TrackerPlot.roiAction button
     '''
     def plotROI(self,event):
@@ -358,13 +369,13 @@ class MyApp(QtWidgets.QMainWindow):
             msg = self.tracker.plot_region(self.tp.poly.xy)
             self.updateStatus(msg)
 
-    def showTrackXY(self, track,x,y):
+    def showTrackXY(self, track,tracknum,x,y):
         #Clean up previous
         if (self.p1 is not None):
             plt.close(self.p1)
-
+        tracklength = np.sqrt((x[-1] - x[0])**2 + (y[-1] - y[0])**2)
         fig = plt.figure(track,dpi=45,frameon=False)
-        plt.suptitle("Track " + str(track) + " (" + str(len(x)) + " points, length=)")
+        plt.suptitle("Plot " + str(track) + ": Track " + str(tracknum) + " (" + str(len(x)) + " points, length=" + str(round(tracklength,4)) + ")")
         plt.xlabel('x')
         plt.ylabel('y')
         self.p1 = fig
@@ -373,14 +384,44 @@ class MyApp(QtWidgets.QMainWindow):
         self.scene.addWidget(self.canvas)
         self.canvas.draw()
 
-    def showMSD(self,track,t,sd):
+    def showCSD(self,track,tracknum, t,sd):
         if (self.p2 is not None):
             plt.close(self.p2)
 
         fig = plt.figure(dpi=45,frameon=False)
-        plt.suptitle("MSD for track "+ str(track))
+        plt.suptitle("Plot " + str(track) + ": CSD for Track "+ str(tracknum))
         plt.xlabel('time (s)')
-        plt.ylabel('(Cumulative Square Displacement(CSD)')
+        plt.ylabel('Cumulative Square Displacement(CSD)')
+        #convert frame numbers to time
+        t0 = t[0]
+        framerate = round(self.ui.spinFramerate.value() / 60,2)
+
+        if (t0 > 1):
+            tf = [x-t0 for x in t]
+        else:
+            tf = t
+        t1 = [f * framerate for f in tf]
+        msd = 0
+        csd = []
+        for idx,s in enumerate(sd):
+            msd = s + msd
+            csd.append(msd)
+
+        plt.plot(t1,csd)
+
+        self.canvas2 = FigureCanvas(fig)
+        self.scene2.addWidget(self.canvas2)
+        self.canvas2.draw()
+        self.p2 = fig
+
+    def showMSD(self,track,tracknum,t,x,y):
+        if (self.p2 is not None):
+            plt.close(self.p2)
+
+        fig = plt.figure(dpi=45,frameon=False)
+        plt.suptitle("Plot " + str(track) + ": MSD for Track "+ str(tracknum))
+        plt.xlabel('time (s)')
+        plt.ylabel('Mean Square Displacement(MSD)')
         #convert frame numbers to time
         t0 = t[0]
         framerate = round(self.ui.spinFramerate.value() / 60,2)
@@ -390,22 +431,37 @@ class MyApp(QtWidgets.QMainWindow):
         else:
             tf = t
         t1 = [x * framerate for x in tf]
-        #calculate MSD - cumulative SD ?check
+        #calculate Diffusion coeff at each time D?(?x)2/(?t)
         msd = 0
         csd = []
-        for s in sd:
-            msd = s + msd
+
+        for idx,s in enumerate(x):
+            sd = 0
+            td = 1
+            for i in range(len(x)-idx):
+                sd = sd + (x[idx+i] - x[i])**2 + (y[idx+i]-y[i])**2
+                td = td + idx
+            msd = sd/(4*td)
             csd.append(msd)
 
         plt.plot(t1,csd)
+
         self.canvas2 = FigureCanvas(fig)
         self.scene2.addWidget(self.canvas2)
         self.canvas2.draw()
         self.p2 = fig
 
     def loadTrack(self,track):
+        ptrack = self.tracker.getPlotByIndex(track-1)
+        ptracknum = ptrack[0]
+        ptracklist = ptrack[1]
+        print("loadTrack: plot=" + str(track) + " track=" + str(ptracknum) + " num points=" + str(len(ptracklist)))
         #Sort by timeframe
-        tracklist = sorted(self.tracker.plotter[track], key=lambda t: t.frame)
+        if (len(ptracklist) > 0):
+            tracklist = sorted(ptracklist, key=lambda t: t.frame)
+
+        else:
+            tracklist = ptracklist
         x = []
         y = []
         sd = []
@@ -416,15 +472,59 @@ class MyApp(QtWidgets.QMainWindow):
             frames.append(tn.frame)
             sd.append(tn.dx**2 + tn.dy**2)
         #Display plots
-        self.showTrackXY(track,x,y)
-        self.showMSD(track,frames,sd)
+        self.showTrackXY(track,ptracknum,x,y)
+        if (self.ui.radioCSD.isChecked()):
+            self.showCSD(track,ptracknum, frames,sd)
+        else:
+            self.showMSD(track,ptracknum,frames,x,y)
         #Update track review
+        if track in self.excluded:
+            self.ui.checkExclude.setChecked(True)
+        else:
+            self.ui.checkExclude.setChecked(False)
         self.current = track
         self.ui.txtCurrent = track
 
 
     def excludeTrack(self):
         self.excluded.append(self.current)
+
+    ''' saveData
+        Definition: outputs coordinates per plot (except exclusions)
+    '''
+    def saveData(self):
+        params = self.loadparams();
+        outputfilename = params['OutputFile']
+        #Allow user to choose
+        browser = QtWidgets.QFileDialog(self)
+        browser.setFileMode(QtWidgets.QFileDialog.Directory)
+        browser.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
+        idnum = str(len(self.tracker.plotter) - len(self.excluded)) + '_' + str(self.ui.spinMinpoints.value()) +\
+                '_' + str(int(self.ui.spinMinlength.value())) + '_' + str(int(self.ui.spinMaxlength.value()))
+        outputfilename = str.replace(outputfilename,'.csv','_'+ idnum +'.csv')
+        fname, _ = browser.getSaveFileName(self, 'Save as', outputfilename,'CSV files (*.csv)')
+
+        if fname:
+            msg = self.tracker.save_data(fname,self.excluded)
+            self.updateStatus(msg)
+
+    '''Load generated data files for review (and save) ONLY
+    '''
+    def loadData(self):
+        #Allow user to choose
+        browser = QtWidgets.QFileDialog(self)
+        browser.setFileMode(QtWidgets.QFileDialog.Directory)
+        browser.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
+        fname, _ = browser.getOpenFileName(self, 'Choose a data file',
+            self.settings.value('datafile', '.'),
+                'CSV files (*.csv *.trc)')
+        if fname:
+            self.tracker.load_plotdata(fname)
+            msg = "Plot data loaded from :" + fname + " [" + str(len(self.tracker.plotter)) + " tracks]"
+            self.updateStatus(msg)
+            self.ui.groupPlots.setEnabled(False) #deactivate other controls as not available for review - use clear
+            self.total = len(self.tracker.plotter)
+            self.initPlotReview()
 
     def updateStatus(self, txtout):
         statusoutput = self.ui.listOutput.model()
@@ -435,6 +535,13 @@ class MyApp(QtWidgets.QMainWindow):
         statusoutput = self.ui.listOutput.model()
         statusoutput.clear()
         self.tracker = None
+        self.ui.groupPlots.setEnabled(True)
+        self.ui.groupBoxTracks.setEnabled(False)
+        if (self.p1 is not None):
+            plt.close(self.p1)
+        if (self.p2 is not None):
+            plt.close(self.p2)
+        self.initGraphicsViews()
 
     def helpdialog(self):
         dialog = QtWidgets.QDialog()

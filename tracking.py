@@ -146,7 +146,8 @@ class Tracker:
         self.cache = 0
         self.numdecimal = 1
         self.coordlist = dict()
-        self.plotter = dict()
+        self.plotter = dict() #Store coords by track number for individual plots
+        self.avgplotter = dict() #Store averaged coords by track number for full plot
         self.allplot = collections.OrderedDict()
         self.fieldnames = ['Track', 'Frame','x','y','roundx', 'roundy',
          'dx', 'dy','rho', 'theta', 'intensity','framecount']
@@ -227,7 +228,7 @@ class Tracker:
         
         return valid     
                     
-    def load_input(self,inputfilename):
+    def load_input(self,inputfilename, minpoints=0,minlength=0.00, maxlength=100.00):
         #Open input file
         if sys.version_info >= (3,0,0):
             fi = open(inputfilename, 'r', newline='')
@@ -240,6 +241,7 @@ class Tracker:
             dialect = csv.Sniffer().sniff(csvfile.read(1024))
             csvfile.seek(0)
             fh = csv.reader(csvfile, dialect)
+            tracklist = dict()
             for row in fh:
                 self.ln = fh.line_num
                 #print("Row " , fh.line_num)
@@ -259,20 +261,38 @@ class Tracker:
                     print("TRACK:" + str(self.track))
                     #self.track = int(row['TRACK NUMBER'])
                     self.track = int(row[0])
+                    #load to list for filtering
+                    tracklist.update({self.track:[]})
                 else:
                     self.cache.dx = coord.x - self.cache.x
                     self.cache.dy = coord.y - self.cache.y
-                    roundx = round(self.cache.x,self.numdecimal)
-                    roundy = round(self.cache.y,self.numdecimal)
-
-                    if (roundx,roundy) in self.coordlist:
-                        self.cache.framecount += 1
-                        self.coordlist[(roundx,roundy)].append(self.cache)
-                    else:
-                        self.coordlist.update({(roundx,roundy):[]})
-                        self.coordlist[(roundx,roundy)].append(self.cache)
+                    tracklist[self.track].append(self.cache)
                 self.set_cache(coord)
-                self.counter += 1
+
+            #Filter tracklist then save by coord indexed list
+            for track in tracklist:
+                tracks = sorted(tracklist[track], key=lambda t: t.frame)
+                first = tracks[0]
+                last = tracks[-1]
+                tracklength = np.sqrt((last.x - first.x)**2 + (last.y - first.y)**2)
+                if (len(tracks) >= minpoints and tracklength >= minlength and tracklength <= maxlength):
+                    for co in tracks:
+                        roundx = round(co.x,self.numdecimal)
+                        roundy = round(co.y,self.numdecimal)
+
+                        if (roundx,roundy) in self.coordlist:
+                            co.framecount += 1
+                        else:
+                            self.coordlist.update({(roundx,roundy):[]})
+                        self.coordlist[(roundx,roundy)].append(co)
+                        self.counter += 1
+                        #Add all filtered coords to plotter list (Averaged coords in write_output)
+                        self.addto_plotter(self.plotter,co)
+
+    def addto_plotter(self, plotter, co):
+        if (co.track not in plotter):
+            plotter.update({co.track:[]})
+        plotter[co.track].append(co)
 
     def write_output(self, outfilename):
         msg = "Starting output..."
@@ -288,6 +308,7 @@ class Tracker:
             fieldnames = self.get_headers()
             writer = csv.DictWriter(outfile, delimiter=',',dialect=csv.excel, fieldnames=fieldnames)
             writer.writeheader()
+
             for co in self.coordlist:
                 
                 if (len(self.coordlist[co]) > 1):
@@ -315,14 +336,67 @@ class Tracker:
                     myco.theta = myco.getpolar_theta(myco.dx,myco.dy)
 
                 writer.writerow(myco.get_rowoutput(self.numdecimal))
-                if (myco.track not in self.plotter):
-                    self.plotter.update({myco.track:[]})
-                self.plotter[myco.track].append(myco)
+                #group by tracknum for averaging
+                self.addto_plotter(self.avgplotter,myco)
+
         msg = "Completed"
         return msg
-    
+    '''Write saved data to file and update plotter
+    '''
+    def save_data(self,outfilename,excluded=[]):
+        msg = "Saving data ..."
+        ctr = 0;
+        newplotter = dict()
+        try:
+            if sys.version_info >= (3,0,0):
+                fo = open(outfilename, 'w', newline='')
+            else:
+                fo = open(outfilename, 'wb')
+        except IOError:
+            msg = "ERROR: cannot access output file (maybe open in another program): " + outfilename
+            return msg
+        with fo as outfile:
+            fieldnames = self.get_headers()
+            writer = csv.DictWriter(outfile, delimiter=',',dialect=csv.excel, fieldnames=fieldnames)
+            writer.writeheader()
+            plotlist = list(self.plotter.items())
+            #for each plot
+            for track in plotlist:
+                tracknum = track[0]
+                tracklist = track[1]
+                if (tracknum not in excluded):
+                    ctr = ctr + 1
+                    newplotter.update({tracknum:tracklist})
+                    for co in tracklist:
+                        writer.writerow(co.get_rowoutput(self.numdecimal))
+        self.plotter = newplotter
+        msg = str(ctr) + " tracks written to " + outfilename
+        return msg
+
+    def load_plotdata(self,inputfilename):
+        #Open input file
+        if sys.version_info >= (3,0,0):
+            fi = open(inputfilename, 'r', newline='')
+        else:
+            fi = open(inputfilename, 'rb')
+        #clear plotter
+        self.plotter = dict()
+        with fi as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                coord = Coord(int(row['Track']),
+                        int(row['Frame']),
+                        float(row['x']),float(row['y']),
+                        float(row['intensity']) )
+                coord.load(float(row['dx']),float(row['dy']),
+                           float(row['rho']),float(row['theta']),
+                           int(row['framecount']))
+                self.addto_plotter(self.plotter,coord)
+
+    '''Plot quiver plots with averaged coordinate data
+    '''
     def plottrack(self, trak, totalplots=0, arrow=0.1,png=1):
-        if (trak in self.plotter):
+        if (trak in self.avgplotter):
             
             #create a plot of a track
             plotdir=self.outputdir
@@ -334,7 +408,7 @@ class Tracker:
             print(mytitle)
             msg = mytitle
             #sort track frames
-            tracklist = sorted(self.plotter[trak], key=lambda t: t.frame)
+            tracklist = sorted(self.avgplotter[trak], key=lambda t: t.frame)
 
             for tn in tracklist:
                 x.append(tn.x)
@@ -357,9 +431,6 @@ class Tracker:
 
                 lines = plt.quiver(x,y,rho,theta)
                 plt.setp(lines, color='b', antialiased=True)
-
-                #plt.plot(x,y,linewidth=arrow)
-
                 #Write to file
                 filename = plotdir + "Track_" + str(trak) + ".png"
                 fig.savefig(filename, dpi=300, orientation='landscape', format='png')
@@ -390,7 +461,7 @@ class Tracker:
         alltheta = []
         alltracks = 0
         counter = 0
-        for trak in self.plotter:
+        for trak in self.avgplotter:
             #for each track
             x = []
             y = []
@@ -399,7 +470,7 @@ class Tracker:
             if (counter >= start and counter < end):
                 mytitle = "Track: " + str(trak)
                 print(mytitle)
-                for tn in self.plotter[trak]:
+                for tn in self.avgplotter[trak]:
                     x.append(tn.x)
                     y.append(tn.y)
                     rho.append(tn.getpolar_rho(tn.dx,tn.dy))
@@ -430,7 +501,7 @@ class Tracker:
                 alltracks += 1
             counter += 1
         #Print all
-        fig = plt.figure(len(self.plotter) + 1)
+        fig = plt.figure(len(self.avgplotter) + 1)
         mytitle = "All " + str(alltracks) + " tracks (" + str(len(allx)) + " points)"
         print(mytitle)
         lines = plt.quiver(allx,ally,allrho,alltheta)
@@ -486,6 +557,13 @@ class Tracker:
         msg = 'ROI coordinates written to ' + outfilename
         print(msg)
         return msg
+
+    def getPlotByIndex(self,idx):
+        plotlist = list(self.plotter.items())
+        ptrack = plotlist[idx]
+        # ptracknum = ptrack[0]
+        # ptracklist = ptrack[1]
+        return ptrack
 ## Main
 if __name__ == "__main__":
 
