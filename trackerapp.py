@@ -2,7 +2,8 @@
 '''
     QBI Meunier Tracker APP: GUI for tracker.py (trackerapp.py)
     **************************************************************
-    Description: This script was developed for Andreas in the Meunier Lab at QBI.  It analyses particle tracking information and produces plots.
+    Description: This script was developed for the Meunier Lab at QBI.
+    It analyses particle tracking information and produces plots for review.
     
     Requirements: Python3, PyQt5, matplotlib, numpy, plotly, scipy
     UI files: created in Qt Designer, loaded dynamically with uic
@@ -28,7 +29,6 @@ __version__ = 1.0
 import os
 from os.path import expanduser
 homedir = expanduser("~")
-import time
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QSettings
 from tracking import Tracker
@@ -36,10 +36,8 @@ from trackerplots.trackerplot import TrackerPlot
 from trackerplots.contourplot import ContourPlot
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import (
-    FigureCanvasQTAgg as FigureCanvas,
-    NavigationToolbar2QT as NavigationToolbar)
+    FigureCanvasQTAgg as FigureCanvas)
 
 # create a progressBar while running plotter
 class progress(QtWidgets.QDialog):
@@ -305,7 +303,7 @@ class MyApp(QtWidgets.QMainWindow):
         i = 0
         for n in plotrange:
             if (self.progress.finished == False):
-                trak = self.tracker.getPlotByIndex(n-1)
+                trak = self.tracker.getPlotByIndex(self.tracker.avgplotter,n-1)
                 i += 1
                 self.progress.update(i)
                 QtWidgets.QApplication.processEvents()
@@ -441,7 +439,7 @@ class MyApp(QtWidgets.QMainWindow):
             for i in range(len(x)-idx):
                 sd = sd + (x[idx+i] - x[i])**2 + (y[idx+i]-y[i])**2
                 td = td + idx
-            msd = sd/(4*td)
+            msd = sd/(4*td) #diffusion coeff (nm2/s)
             csd.append(msd)
 
         plt.plot(t1,csd)
@@ -452,7 +450,7 @@ class MyApp(QtWidgets.QMainWindow):
         self.p2 = fig
 
     def loadTrack(self,track):
-        ptrack = self.tracker.getPlotByIndex(track-1)
+        ptrack = self.tracker.getPlotByIndex(self.tracker.plotter,track-1)
         ptracknum = ptrack[0]
         ptracklist = ptrack[1]
         print("loadTrack: plot=" + str(track) + " track=" + str(ptracknum) + " num points=" + str(len(ptracklist)))

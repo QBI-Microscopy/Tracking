@@ -1,19 +1,5 @@
-#!/usr/bin/python3
-'''
-    QBI Meunier Tracker APP: Custom Tracker plots
-    *******************************************************************************
-    Copyright (C) 2015  QBI Software, The University of Queensland
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-'''
+#!/usr/bin/python
+#Custom Tracker plots
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
 import matplotlib
@@ -24,6 +10,8 @@ import matplotlib.mlab as mlab
 from matplotlib.widgets import LassoSelector
 from matplotlib.patches import Polygon
 from matplotlib.lines import Line2D
+from trackerplots import contourplot
+from matplotlib.path import Path
 
 
 class TrackerPlot:
@@ -33,8 +21,6 @@ class TrackerPlot:
         self.ax = plt.gca()
         self.canvas = self.ax.figure.canvas
         self.lasso = LassoSelector(self.ax, self.onselect)
-        self.poly = None
-        self.addlassobuttons()
 
     def testcontour(self):
         #contour plot test data:
@@ -59,7 +45,7 @@ class TrackerPlot:
     def saveROI(self,event):
         if (self.poly):
             print('Saving Polygon coords:',self.poly)
-            #msg = self.tracker.plot_region(self.poly.xy)
+           # msg = self.tracker.plot_region(self.poly.xy)
            # self.updateStatus(msg)
 
     def onselect(self,verts):
@@ -72,32 +58,32 @@ class TrackerPlot:
         #self.canvas.draw_idle()
          #plt.show()
 
+    def disconnect(self):
+        tbar = self.canvas.toolbar
+
+
     def addlassobuttons(self):
         tbar = self.canvas.toolbar
         #Lasso tool
         icon1 = QtGui.QPixmap('resources/pencil.png')
         button_roiSelect = QtWidgets.QAction(QtGui.QIcon(icon1),'ROI',tbar)
-        helpmsg = "Select ROI tool"
-        button_roiSelect.setToolTip(helpmsg)
+        button_roiSelect.setToolTip("Select ROI")
         button_roiSelect.triggered.connect(self.selectROI)
-        button_roiSelect.setStatusTip(helpmsg)
         #Save selection
         icon2 = QtGui.QPixmap('resources/chart.png')
-        button_roi = QtWidgets.QAction(QtGui.QIcon(icon2),'SaveROI',tbar)
-        helpmsg = "Save ROI and create ROI plot"
-        button_roi.setToolTip(helpmsg)
+        button_roi = QtWidgets.QAction(QtGui.QIcon(icon2),'ROI',tbar)
+        button_roi.setToolTip("Save ROI and create ROI plot")
         button_roi.triggered.connect(self.saveROI)
-        button_roi.setStatusTip(helpmsg)
-
         #Add to toolbar
         tbar.addAction(button_roiSelect)
         tbar.addAction(button_roi)
-        self.roiSelect = button_roiSelect
-        self.roiAction = button_roi
 
 
 if __name__ == "__main__":
     print("Plotting test plot")
     tp = TrackerPlot()
     tp.testcontour()
+    tp.addlassobuttons()
+
+    #self.lasso.active = False #initial
     plt.show()

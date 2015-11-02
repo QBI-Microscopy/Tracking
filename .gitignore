@@ -65,3 +65,8 @@ dist/
 build/
 
 .idea/misc.xml
+.idea/workspace.xml
+build.txt
+.idea/Tracking.iml
+dist.txt
+test/test_contour.py

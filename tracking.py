@@ -1,8 +1,9 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 '''
-    tracker.py (GUI version is trackerapp.py)
-    ****************************************************************
-    Description: This script was developed for Andreas in the Meunier Lab at QBI.  It analyses particle tracking information and produces plots.
+    QBI Meunier Tracker APP: tracking.py
+    **************************************************************
+    Description: This script was developed for the Meunier Lab at QBI.
+    It analyses particle tracking information and produces plots for review.
     
     Requirements: Python3, PyQt5, matplotlib, numpy, plotly
     UI files: created in Qt Designer, loaded dynamically with uic
@@ -34,8 +35,8 @@ import collections
 
 import numpy as np
 import matplotlib
+
 matplotlib.use("Qt5Agg")
-import matplotlib.backends.backend_qt5agg
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, Point
 from trackerplots.contourplot import ContourPlot
@@ -558,8 +559,8 @@ class Tracker:
         print(msg)
         return msg
 
-    def getPlotByIndex(self,idx):
-        plotlist = list(self.plotter.items())
+    def getPlotByIndex(self,plotter,idx):
+        plotlist = list(plotter.items())
         ptrack = plotlist[idx]
         # ptracknum = ptrack[0]
         # ptracklist = ptrack[1]
