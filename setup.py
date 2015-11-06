@@ -41,7 +41,7 @@ build_exe_options = {
 # [Bad fix but only thing that works] NB To add Shortcut working dir - change cx_freeze/windist.py Line 61 : last None - > "TARGETDIR" 
 setup(
         name = application_title,
-        version = "2.2",
+        version = "3.0",
         description = "Tracker script with GUI",
         author="Liz Cooper-Williams, QBI",
         author_email="e.cooperwilliams@uq.edu.au",
@@ -50,10 +50,5 @@ setup(
         url="http://github.com/QBI-Microscopy/Tracking",
         license="GNU General Public License (GPL)",
         options = {"build_exe" : build_exe_options,},
-        executables = [Executable(main_python_file,
-                                  base = base,
-                                  targetName="trackerapp.exe",
-                                  icon="resources/target.ico",
-                                  shortcutName=application_title, shortcutDir="DesktopFolder",
-                                  requires=['matplotlib'], requires=['shapely'],
-                                  requires=['numpy'])])
+        executables = [Executable(main_python_file, base = base, targetName="trackerapp.exe",icon="resources/target.ico",
+        shortcutName=application_title, shortcutDir="DesktopFolder")])
