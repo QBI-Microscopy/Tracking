@@ -65,3 +65,7 @@ dist/
 build/
 
 .idea/misc.xml
+
+*.copy
+
+*.test
