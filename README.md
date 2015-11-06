@@ -7,8 +7,12 @@ A 64bit Windows and 64bit MacOSX (Yosemite) installations are provided in Releas
 
 
 '''
-    QBI Meunier Tracker APP
     *******************************************************************************
+
+    QBI Meunier Tracker APP
+
+    *******************************************************************************
+
     Copyright (C) 2015  QBI Software, The University of Queensland
 
     This program is free software; you can redistribute it and/or modify

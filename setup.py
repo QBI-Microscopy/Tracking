@@ -50,5 +50,10 @@ setup(
         url="http://github.com/QBI-Microscopy/Tracking",
         license="GNU General Public License (GPL)",
         options = {"build_exe" : build_exe_options,},
-        executables = [Executable(main_python_file, base = base, targetName="trackerapp.exe",icon="resources/target.ico",
-        shortcutName=application_title, shortcutDir="DesktopFolder")])
+        executables = [Executable(main_python_file,
+                                  base = base,
+                                  targetName="trackerapp.exe",
+                                  icon="resources/target.ico",
+                                  shortcutName=application_title, shortcutDir="DesktopFolder",
+                                  requires=['matplotlib'], requires=['shapely'],
+                                  requires=['numpy'])])
