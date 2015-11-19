@@ -49,8 +49,6 @@ def get_filename(prompt, complaint='Unable to find file!'):
         else:
             raise IOError('File Error')
 
-
-
 def file_check(fn):
     try:
         open(fn, "r")
@@ -86,7 +84,7 @@ class Coord:
         self.theta = theta
         self.framecount = framecount
         self.gradient = self.dy / self.dx
-        self.sd = self.dx ** 2 + self.dy ** 2
+        #self.sd = self.dx ** 2 + self.dy ** 2
 
     ''' Determines if x,y coordinates have changed
         Args: (x,y) and (x1,y1) - 2 sets of coordinates
@@ -122,7 +120,7 @@ class Coord:
                'theta': self.theta,  # getpolar_theta(self.dy,self.dx),
                'intensity': self.intensity,
                'framecount': str(self.framecount),
-               'sd': self.sd
+               #'sd': self.sd
                }
         return row
 
@@ -153,7 +151,7 @@ class Tracker:
         self.avgplotter = dict()  # Store averaged coords by track number for full plot
         self.msd = collections.OrderedDict() #dict()
         self.fieldnames = ['Track', 'Frame', 'x', 'y', 'roundx', 'roundy',
-                           'dx', 'dy', 'rho', 'theta', 'intensity', 'framecount', 'sd']
+                           'dx', 'dy', 'rho', 'theta', 'intensity', 'framecount']
         self.inputheaders = ['TRACK NUMBER', 'frame number', 'x', 'y', 'intensity']
         self.outputdir = '.'
         self.fromplot = 0
@@ -181,7 +179,9 @@ class Tracker:
             return 0
 
     '''
-    Calculate MSD for each particle within a whole track
+    Calculate MSD for each time interval per track
+    Spatial displacement: pos at given t from initial pos
+    MSD =<(x(t) - x0)^2>
     '''
     def calculate_msd(self, plot):
         # ptrack = self.getPlotByIndex(self.plotter,tracknum)
@@ -195,20 +195,19 @@ class Tracker:
             tracklist = ptracklist
         msdlist = dict()  # hashlist of msd per time interval
         ln = len(tracklist)
-        #tracklist.update({self.track: []})
-        #tracklist[self.track].append(self.cache)
         #compare with each coord for each time interval : 1T, 2T 3T
         for i in range(1, ln - 1):
             sd = 0
             ctr = 0
-            for j in range(0, len(tracklist) - i):
+            for j in range(0, ln - i):
                 c1 = tracklist[j+i]
                 c2 = tracklist[j]
                 sd = sd + (c1.x - c2.x) ** 2 + (c1.y - c2.y) ** 2
-                ctr = ctr + i
+                ctr = ctr + 1
             if (ctr > 0):
                 t = round(i * self.framerate,2)
-                msdlist.update({t : (sd / ctr)})
+                msdlist.update({i : (sd / ctr)})
+
 
         # save updated list
         self.msd.update({ptracknum: msdlist})
@@ -430,11 +429,39 @@ class Tracker:
         self.plotter = newplotter
         msg = str(ctr) + " tracks written to " + outfilename
         return msg, ctr
-
-    def save_msd(self, outfilename, excluded=[]):
+    """ Output MSD per time interval per track for max intervals
+    Format: 'dT'. 'track1' 'track2' ...
+    """
+    def save_msd(self, outfilename, excluded=[],max=5):
         msg = "Saving data ..."
         ctr = 0;
         newplotter = dict()
+
+
+        # msdlist = collections.OrderedDict()
+        # for i in range(1,max + 1):
+        #     msdlist.update({i:[]})
+        fieldnames = ['dT']
+        plotlist = list(self.msd.items())
+        #initialise & organise data
+        msdlist = [[0 for x in range(len(plotlist)+1)] for x in range(max+1)]
+        msdlist[0][0] = 'dT'
+        msdrow = {'dT': 0}
+        for track in plotlist:
+            tracknum = track[0]
+            tracklist = track[1]
+            if (tracknum not in excluded):
+                newplotter.update({tracknum: tracklist})
+                fieldnames.append('track' + str(tracknum))
+
+                msdlist[0][tracknum] = 'track' + str(tracknum)
+                ctr = ctr + 1
+                for m in tracklist.items():
+                    dt = int(m[0])
+                    if (dt <= max):
+                        msdlist[dt][0] = dt
+                        msdlist[dt][tracknum] = m[1]
+
         try:
             if sys.version_info >= (3, 0, 0):
                 fo = open(outfilename, 'w', newline='')
@@ -444,21 +471,35 @@ class Tracker:
             msg = "ERROR: cannot access output file (maybe open in another program): " + outfilename
             return msg
         with fo as outfile:
-            fieldnames = ['track','time','msd']
             writer = csv.DictWriter(outfile, delimiter=',', dialect=csv.excel, fieldnames=fieldnames)
             writer.writeheader()
-            plotlist = list(self.msd.items())
-            # for each plot
-            for track in plotlist:
-                tracknum = track[0]
-                tracklist = track[1]
-                if (tracknum not in excluded):
-                    ctr = ctr + 1
-                    newplotter.update({tracknum: tracklist})
-                    for co in tracklist.items():
-                        writer.writerow({'track': tracknum,'time': co[0], 'msd': co[1]})
+            msdavg = []
+            msdse = []
+            msdt = []
+            #writer.writerow({'dT': k,'track' + str(tracknum): v})
+            for rownum in range(1, max + 1):
+                row ={}
+                for colnum in range(len(plotlist) + 1):
+                   row[msdlist[0][colnum]]= msdlist[rownum][colnum]
+                writer.writerow(row)
+                #msdavg[msdlist[rownum][0]] = np.mean(row[1:-1])
+                #msdse[msdlist[rownum][0]] = np.std(row[1:-1])
+                # msdavg.append(np.mean(row[rownum][1:-1]))
+                # msdse.append(np.std(row[rownum][1:-1]))
+                # msdt.append(msdlist[0][colnum])
         self.msd = newplotter
-        msg = str(ctr) + " msd plots written to " + outfilename
+        self.msdlist = msdlist
+        # x = msdavg
+        # y = msdt
+        # e = msdse
+        # fig = plt.figure()
+        # plt.xlabel('dT')
+        # plt.ylabel('MSD')
+        # plt.title('Avg MSD')
+        # plt.errorbar(x, y, e, linestyle='None', marker='^')
+        # plt.show()
+
+        msg = str(ctr) + " MSD tracks written to " + outfilename
         return msg
 
     def load_plotdata(self, inputfilename):
