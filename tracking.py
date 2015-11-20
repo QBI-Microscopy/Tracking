@@ -433,7 +433,7 @@ class Tracker:
     """ Output MSD per time interval per track for max intervals
     Format: 'dT'. 'track1' 'track2' ...
     """
-    def save_msd(self, outfilename, excluded=[],max=5):
+    def save_msd(self, outfilename, excluded=[],max=10):
         msg = "Saving data ..."
         ctr = 0;
         newplotter = dict()
