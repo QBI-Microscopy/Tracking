@@ -864,14 +864,14 @@
     <widget class="QPushButton" name="btnReviewSave">
      <property name="geometry">
       <rect>
-       <x>570</x>
-       <y>19</y>
-       <width>131</width>
+       <x>510</x>
+       <y>20</y>
+       <width>81</width>
        <height>41</height>
       </rect>
      </property>
      <property name="text">
-      <string>Save plot data</string>
+      <string>Save plots</string>
      </property>
     </widget>
     <widget class="QCheckBox" name="checkExclude">
@@ -935,9 +935,9 @@
     <widget class="QPushButton" name="btnReviewDataset">
      <property name="geometry">
       <rect>
-       <x>426</x>
-       <y>19</y>
-       <width>141</width>
+       <x>400</x>
+       <y>20</y>
+       <width>101</width>
        <height>41</height>
       </rect>
      </property>
@@ -972,6 +972,22 @@
      </property>
      <property name="text">
       <string>Time intervals</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnExport">
+     <property name="geometry">
+      <rect>
+       <x>610</x>
+       <y>20</y>
+       <width>75</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Export data to vbSPT</string>
+     </property>
+     <property name="text">
+      <string>Export</string>
      </property>
     </widget>
    </widget>

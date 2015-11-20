@@ -33,6 +33,7 @@ homedir = expanduser("~")
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import QSettings
 from tracking import Tracker
+from trackerplots.trackerSPT import TrackerSPT
 from trackerplots.trackerplot import TrackerPlot
 from trackerplots.contourplot import ContourPlot
 import numpy as np
@@ -105,6 +106,7 @@ class MyApp(QtWidgets.QMainWindow):
         self.ui.btnClear.clicked.connect(self.clearfields)
         self.ui.toolButtonHelp.clicked.connect(self.helpdialog)
         self.ui.btnReviewSave.clicked.connect(self.saveData)
+        self.ui.btnExport.clicked.connect(self.exportData)
         self.ui.btnReviewDataset.clicked.connect(self.loadData)
         self.ui.checkExclude.clicked.connect(self.excludeTrack)
         self.ui.spinCurrentTrack.valueChanged.connect(self.loadTrack, self.ui.spinCurrentTrack.value())
@@ -500,6 +502,21 @@ class MyApp(QtWidgets.QMainWindow):
             self.total = total
             self.initPlotReview()
             self.loadTrack(1)
+
+    def exportData(self):
+        params = self.loadparams();
+        outputfilename = params['OutputFile']
+        # Allow user to choose
+        browser = QtWidgets.QFileDialog(self)
+        browser.setFileMode(QtWidgets.QFileDialog.Directory)
+        browser.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
+        outputfilename = str.replace(outputfilename, '.csv', '.mat')
+        fname, _ = browser.getSaveFileName(self, 'Save as', outputfilename, 'Matlab files (*.mat)')
+        spt = TrackerSPT()
+        spt.load_data(self.tracker)
+        spt.save_mat(fname)
+        msg = "Data exported to Matlab: " + fname
+        self.updateStatus(msg)
 
     '''Load generated data files for review (and save) ONLY
     '''
