@@ -439,8 +439,9 @@ class Tracker:
         newplotter = dict()
         fieldnames = ['dT']
         plotlist = list(self.msd.items())
+        numcols = self.find_max_tracknum(plotlist)
         #initialise & organise data
-        msdlist = [[0 for x in range(len(plotlist)+ 1)] for x in range(max + 1)]
+        msdlist = [[0 for x in range(numcols+ 1)] for x in range(max + 1)]
         msdlist[0][0] = 'dT'
         for track in plotlist:
             tracknum = track[0]
@@ -477,7 +478,8 @@ class Tracker:
             for rownum in range(1, max + 1):
                 row ={}
                 for colnum in range(len(plotlist) + 1):
-                   row[msdlist[0][colnum]]= msdlist[rownum][colnum]
+                    if msdlist[0][colnum]:
+                        row[msdlist[0][colnum]]= msdlist[rownum][colnum]
                 writer.writerow(row)
                 #Averaged per time interval
                 y.append(np.mean(msdlist[rownum][1:-1]))
@@ -489,6 +491,11 @@ class Tracker:
         msg = str(ctr) + " MSD tracks written to " + outfilename
         return msg
 
+    def find_max_tracknum(self,plotlist):
+        tracknums = []
+        for track in plotlist:
+            tracknums.append(track[0])
+        return max(tracknums)
     # def write_msd(self,msdlist,outfilename,fieldnames):
     #     try:
     #         if sys.version_info >= (3, 0, 0):

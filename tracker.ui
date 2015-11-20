@@ -877,20 +877,20 @@
     <widget class="QCheckBox" name="checkExclude">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>37</y>
-       <width>111</width>
+       <x>210</x>
+       <y>35</y>
+       <width>71</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Exclude track</string>
+      <string>Exclude</string>
      </property>
     </widget>
     <widget class="QLabel" name="labelTotalTracks">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>110</x>
        <y>30</y>
        <width>91</width>
        <height>31</height>
@@ -909,14 +909,14 @@
     <widget class="QSpinBox" name="spinCurrentTrack">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>50</x>
        <y>30</y>
        <width>51</width>
        <height>31</height>
       </rect>
      </property>
      <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
+      <enum>Qt::LeftToRight</enum>
      </property>
     </widget>
     <widget class="QLabel" name="label_6">
@@ -924,12 +924,12 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>91</width>
+       <width>41</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
-      <string>Plot Number</string>
+      <string>Plot </string>
      </property>
     </widget>
     <widget class="QPushButton" name="btnReviewDataset">
@@ -943,6 +943,35 @@
      </property>
      <property name="text">
       <string>Load dataset</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinIntervals">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>40</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Max time intervals for MSD</string>
+     </property>
+     <property name="value">
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_19">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>13</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Time intervals</string>
      </property>
     </widget>
    </widget>

@@ -92,6 +92,7 @@ class MyApp(QtWidgets.QMainWindow):
         self.ui.spinContours.setValue(float(self.settings.value('contours', '0')))
         self.ui.spinDec.setValue(float(self.settings.value('decimal', '1')))
         self.ui.spinFramerate.setValue(float(self.settings.value('framerate', '1')))
+        self.ui.spinIntervals.setValue(float(self.settings.value('intervals','10')))
         if (len(self.ui.txtInput.text()) > 5 and len(self.ui.txtOutputdir.text()) > 5 and len(
                 self.ui.txtOutputfile.text()) > 5):
             self.ui.btnRunScript.setEnabled(True)
@@ -493,7 +494,8 @@ class MyApp(QtWidgets.QMainWindow):
             msg, total = self.tracker.save_data(fname, self.excluded)
             self.updateStatus(msg)
             fname = str.replace(fname, '.csv', '_msd.csv')
-            msg = self.tracker.save_msd(fname, self.excluded)
+            intervals = int(self.ui.spinIntervals.value())
+            msg = self.tracker.save_msd(fname, self.excluded,intervals)
             self.updateStatus(msg)
             self.total = total
             self.initPlotReview()
@@ -554,6 +556,7 @@ class MyApp(QtWidgets.QMainWindow):
             self.settings.setValue("contours", self.ui.spinContours.value())
             self.settings.setValue("decimal", self.ui.spinDec.value())
             self.settings.setValue("framerate", self.ui.spinFramerate.value())
+            self.settings.setValue("intervals", self.ui.spinIntervals.value())
             self.progress.close()
             if (self.fig is not None):
                 plt.close(self.fig)
