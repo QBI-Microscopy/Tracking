@@ -38,6 +38,7 @@ matplotlib.use("Qt5Agg")
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, Point
 from trackerplots.contourplot import ContourPlot
+from scipy import stats
 
 
 def get_filename(prompt, complaint='Unable to find file!'):
@@ -436,17 +437,11 @@ class Tracker:
         msg = "Saving data ..."
         ctr = 0;
         newplotter = dict()
-
-
-        # msdlist = collections.OrderedDict()
-        # for i in range(1,max + 1):
-        #     msdlist.update({i:[]})
         fieldnames = ['dT']
         plotlist = list(self.msd.items())
         #initialise & organise data
-        msdlist = [[0 for x in range(len(plotlist)+1)] for x in range(max+1)]
+        msdlist = [[0 for x in range(len(plotlist)+ 1)] for x in range(max + 1)]
         msdlist[0][0] = 'dT'
-        msdrow = {'dT': 0}
         for track in plotlist:
             tracknum = track[0]
             tracklist = track[1]
@@ -461,6 +456,7 @@ class Tracker:
                     if (dt <= max):
                         msdlist[dt][0] = dt
                         msdlist[dt][tracknum] = m[1]
+        self.msd = newplotter # non-excluded plots
 
         try:
             if sys.version_info >= (3, 0, 0):
@@ -470,37 +466,68 @@ class Tracker:
         except IOError:
             msg = "ERROR: cannot access output file (maybe open in another program): " + outfilename
             return msg
+
         with fo as outfile:
             writer = csv.DictWriter(outfile, delimiter=',', dialect=csv.excel, fieldnames=fieldnames)
             writer.writeheader()
-            msdavg = []
-            msdse = []
-            msdt = []
-            #writer.writerow({'dT': k,'track' + str(tracknum): v})
+            y = []
+            se = []
+            x = []
+            #Syntax: writer.writerow({'dT': k,'track' + str(tracknum): v})
             for rownum in range(1, max + 1):
                 row ={}
                 for colnum in range(len(plotlist) + 1):
                    row[msdlist[0][colnum]]= msdlist[rownum][colnum]
                 writer.writerow(row)
-                #msdavg[msdlist[rownum][0]] = np.mean(row[1:-1])
-                #msdse[msdlist[rownum][0]] = np.std(row[1:-1])
-                # msdavg.append(np.mean(row[rownum][1:-1]))
-                # msdse.append(np.std(row[rownum][1:-1]))
-                # msdt.append(msdlist[0][colnum])
-        self.msd = newplotter
-        self.msdlist = msdlist
-        # x = msdavg
-        # y = msdt
-        # e = msdse
-        # fig = plt.figure()
-        # plt.xlabel('dT')
-        # plt.ylabel('MSD')
-        # plt.title('Avg MSD')
-        # plt.errorbar(x, y, e, linestyle='None', marker='^')
-        # plt.show()
+                #Averaged per time interval
+                y.append(np.mean(msdlist[rownum][1:-1]))
+                se.append(np.std(msdlist[rownum][1:-1]))
+                x.append(msdlist[rownum][0])
+
+        self.show_avg_msd(x,y,se)
 
         msg = str(ctr) + " MSD tracks written to " + outfilename
         return msg
+
+    # def write_msd(self,msdlist,outfilename,fieldnames):
+    #     try:
+    #         if sys.version_info >= (3, 0, 0):
+    #             fo = open(outfilename, 'w', newline='')
+    #         else:
+    #             fo = open(outfilename, 'wb')
+    #     except IOError:
+    #         msg = "ERROR: cannot access output file (maybe open in another program): " + outfilename
+    #         return msg
+    #     total = len(list(self.msd.items()))
+    #     if (len(msdlist) > 0):
+    #
+    #         with fo as outfile:
+    #             writer = csv.DictWriter(outfile, delimiter=',', dialect=csv.excel, fieldnames=fieldnames)
+    #             writer.writeheader()
+    #             #writer.writerow({'dT': k,'track' + str(tracknum): v})
+    #             for rownum in range(1, max + 1):
+    #                 row ={}
+    #                 for colnum in range(total + 1):
+    #                    row[msdlist[0][colnum]]= msdlist[rownum][colnum]
+    #                 writer.writerow(row)
+    #
+    #     else:
+    #         msg = "ERROR: msd data not found"
+    #         return msg
+
+    """ Show MSD plots averaged
+       Requires msdlist from generate_msdlist
+       """
+    def show_avg_msd(self,x=[],y=[],se=[]):
+        #if (len(x) <= 0): TODO
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+        fig = plt.figure()
+        plt.xlim(min(x) - 1, max(x) + 1)
+        plt.xlabel('dT')
+        plt.ylabel('MSD (um2)')
+        plt.title('Avg MSD (slope=' + str(slope) + ')')
+        plt.errorbar(x, y, se, linestyle='-', color='r',marker='o')
+        plt.show()
 
     def load_plotdata(self, inputfilename):
         # Open input file

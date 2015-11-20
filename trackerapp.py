@@ -394,8 +394,8 @@ class MyApp(QtWidgets.QMainWindow):
     def showMSD(self, track, tracknum, msd):
         fig = plt.figure(dpi=45, frameon=False)
         plt.suptitle("Plot " + str(track) + ": MSD for Track " + str(tracknum))
-        plt.xlabel('time (s)')
-        plt.ylabel('Mean Square Displacement(MSD)')
+        plt.xlabel('dT')
+        plt.ylabel('Mean Square Displacement(MSD) (um2)')
         tracklist = sorted(msd.items(), key=lambda t: t[0])
         msdlist = []
         t1 = []
@@ -403,7 +403,7 @@ class MyApp(QtWidgets.QMainWindow):
             msdlist.append(s[1])
             t1.append(s[0])
 
-        plt.plot(t1, msdlist)
+        plt.plot(t1, msdlist,color='r',linestyle='--')
         return fig
 
     def loadTrack(self, track):
