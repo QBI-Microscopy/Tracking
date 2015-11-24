@@ -189,7 +189,7 @@
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>615</y>
+      <y>602</y>
       <width>621</width>
       <height>61</height>
      </rect>
@@ -367,8 +367,8 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>88</y>
-       <width>570</width>
+       <y>90</y>
+       <width>581</width>
        <height>28</height>
       </rect>
      </property>
@@ -400,7 +400,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Min number points</string>
+         <string>Min points</string>
         </property>
        </widget>
       </item>
@@ -439,17 +439,18 @@
        </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
+       <widget class="QLabel" name="label_20">
+        <property name="text">
+         <string>Displacement</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="spinDisplacement">
+        <property name="toolTip">
+         <string>Minimum displacement length</string>
         </property>
-       </spacer>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_16">
@@ -804,7 +805,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>630</y>
+      <y>611</y>
       <width>81</width>
       <height>41</height>
      </rect>
@@ -827,7 +828,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>340</y>
+      <y>330</y>
       <width>350</width>
       <height>270</height>
      </rect>
@@ -837,7 +838,7 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>340</y>
+      <y>330</y>
       <width>350</width>
       <height>270</height>
      </rect>
@@ -861,19 +862,6 @@
     <property name="title">
      <string>Review Tracks</string>
     </property>
-    <widget class="QPushButton" name="btnReviewSave">
-     <property name="geometry">
-      <rect>
-       <x>510</x>
-       <y>20</y>
-       <width>81</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Save plots</string>
-     </property>
-    </widget>
     <widget class="QCheckBox" name="checkExclude">
      <property name="geometry">
       <rect>
@@ -932,23 +920,10 @@
       <string>Plot </string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btnReviewDataset">
-     <property name="geometry">
-      <rect>
-       <x>400</x>
-       <y>20</y>
-       <width>101</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Load dataset</string>
-     </property>
-    </widget>
     <widget class="QSpinBox" name="spinIntervals">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>300</x>
        <y>40</y>
        <width>42</width>
        <height>22</height>
@@ -964,8 +939,8 @@
     <widget class="QLabel" name="label_19">
      <property name="geometry">
       <rect>
-       <x>310</x>
-       <y>13</y>
+       <x>280</x>
+       <y>15</y>
        <width>91</width>
        <height>21</height>
       </rect>
@@ -974,38 +949,61 @@
       <string>Time intervals</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btnExport">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>610</x>
+       <x>370</x>
        <y>20</y>
-       <width>75</width>
-       <height>41</height>
+       <width>328</width>
+       <height>26</height>
       </rect>
      </property>
-     <property name="toolTip">
-      <string>Export data to vbSPT</string>
-     </property>
-     <property name="text">
-      <string>Export</string>
-     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1,1,1">
+      <property name="leftMargin">
+       <number>1</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="btnReviewDataset">
+        <property name="text">
+         <string>Load dataset</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnAvgMSD">
+        <property name="text">
+         <string>Avg MSD</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnReviewSave">
+        <property name="text">
+         <string>Save plots</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnExport">
+        <property name="toolTip">
+         <string>Export data to vbSPT</string>
+        </property>
+        <property name="text">
+         <string>Export</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
-   </widget>
-   <widget class="QSpinBox" name="spinFramerate">
-    <property name="geometry">
-     <rect>
-      <x>582</x>
-      <y>60</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>1</number>
-    </property>
-    <property name="value">
-     <number>25</number>
-    </property>
    </widget>
    <widget class="QLabel" name="label_17">
     <property name="geometry">
@@ -1017,20 +1015,20 @@
      </rect>
     </property>
     <property name="text">
-     <string>Frame rate (fps)</string>
+     <string>Frame interval (s)</string>
     </property>
    </widget>
-   <widget class="QLabel" name="labelReviewPanel">
+   <widget class="QDoubleSpinBox" name="spinFramerate">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>320</y>
-      <width>701</width>
-      <height>21</height>
+      <x>600</x>
+      <y>70</y>
+      <width>62</width>
+      <height>22</height>
      </rect>
     </property>
-    <property name="text">
-     <string>No Tracks loaded</string>
+    <property name="value">
+     <double>0.020000000000000</double>
     </property>
    </widget>
    <zorder>groupPlots</zorder>
@@ -1051,12 +1049,206 @@
    <zorder>graphicsView1</zorder>
    <zorder>graphicsView2</zorder>
    <zorder>groupBoxTracks</zorder>
-   <zorder>spinFramerate</zorder>
    <zorder>label_17</zorder>
-   <zorder>labelReviewPanel</zorder>
+   <zorder>spinFramerate</zorder>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>730</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_Open_input_file"/>
+    <addaction name="actionO_utput_folder"/>
+    <addaction name="actionOu_tput_filename"/>
+    <addaction name="separator"/>
+    <addaction name="action_Load_dataset"/>
+    <addaction name="actionSave_plot_data"/>
+    <addaction name="action_Export_data_to_vbSPT"/>
+    <addaction name="separator"/>
+    <addaction name="actionE_xit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Actions">
+    <property name="title">
+     <string>&amp;Actions</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="action_Run"/>
+    <addaction name="separator"/>
+    <addaction name="actionAverage_MSD"/>
+    <addaction name="separator"/>
+    <addaction name="action_Clear_fields"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionA_bout"/>
+    <addaction name="actionHelp"/>
+    <addaction name="action_Check_for_updates"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Actions"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <action name="action_Open_input_file">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/open.png</normaloff>resources/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open input file</string>
+   </property>
+  </action>
+  <action name="actionO_utput_folder">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/folder.png</normaloff>resources/folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>O&amp;utput folder</string>
+   </property>
+  </action>
+  <action name="actionOu_tput_filename">
+   <property name="text">
+    <string>Ou&amp;tput filename</string>
+   </property>
+  </action>
+  <action name="action_Load_dataset">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/csv.png</normaloff>resources/csv.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Load dataset</string>
+   </property>
+  </action>
+  <action name="actionSave_plot_data">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/save.png</normaloff>resources/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save &amp;plot data</string>
+   </property>
+  </action>
+  <action name="action_Export_data_to_vbSPT">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/Measure.png</normaloff>resources/Measure.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Export data to vbSPT</string>
+   </property>
+  </action>
+  <action name="actionE_xit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+  </action>
+  <action name="action_Run">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/48px-Go-next.svg.png</normaloff>resources/48px-Go-next.svg.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Run</string>
+   </property>
+  </action>
+  <action name="actionAverage_MSD">
+   <property name="text">
+    <string>Average &amp;MSD</string>
+   </property>
+  </action>
+  <action name="action_Clear_fields">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/clear.png</normaloff>resources/clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Clear fields</string>
+   </property>
+  </action>
+  <action name="actionA_bout">
+   <property name="text">
+    <string>A&amp;bout</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset>
+     <normaloff>resources/Help-browser.svg.png</normaloff>resources/Help-browser.svg.png</iconset>
+   </property>
+   <property name="text">
+    <string>Manua&amp;l</string>
+   </property>
+  </action>
+  <action name="action_Check_for_updates">
+   <property name="text">
+    <string>&amp;Check for updates</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>toolButtonHelp</tabstop>
+  <tabstop>txtInput</tabstop>
+  <tabstop>btnFileBrowser</tabstop>
+  <tabstop>txtOutputdir</tabstop>
+  <tabstop>btnFolderBrowser</tabstop>
+  <tabstop>txtOutputfile</tabstop>
+  <tabstop>checkBoxAllPlots</tabstop>
+  <tabstop>spinPlotFrom</tabstop>
+  <tabstop>spinPlotTo</tabstop>
+  <tabstop>checkPNG</tabstop>
+  <tabstop>checkBoxMatlab</tabstop>
+  <tabstop>spinDec</tabstop>
+  <tabstop>spinContours</tabstop>
+  <tabstop>spinArrowsize</tabstop>
+  <tabstop>spinMinpoints</tabstop>
+  <tabstop>spinDisplacement</tabstop>
+  <tabstop>spinMinlength</tabstop>
+  <tabstop>spinMaxlength</tabstop>
+  <tabstop>spinCurrentTrack</tabstop>
+  <tabstop>checkExclude</tabstop>
+  <tabstop>spinIntervals</tabstop>
+  <tabstop>btnReviewDataset</tabstop>
+  <tabstop>btnReviewSave</tabstop>
+  <tabstop>btnExport</tabstop>
+  <tabstop>graphicsView1</tabstop>
+  <tabstop>graphicsView2</tabstop>
+  <tabstop>btnClear</tabstop>
+  <tabstop>scrollOutput</tabstop>
+  <tabstop>listOutput</tabstop>
+  <tabstop>btnRunScript</tabstop>
+ </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionE_xit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

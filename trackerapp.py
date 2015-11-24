@@ -101,17 +101,29 @@ class MyApp(QtWidgets.QMainWindow):
         self.init_graphics_views()
         # Set actions
         self.ui.btnRunScript.clicked.connect(self.runscript)
+        self.ui.action_Open_input_file.triggered.connect(self.popupInput)
         self.ui.btnFileBrowser.clicked.connect(self.popupInput)
+        self.ui.actionO_utput_folder.triggered.connect(self.popupOutput)
         self.ui.btnFolderBrowser.clicked.connect(self.popupOutput)
+        self.ui.action_Clear_fields.triggered.connect(self.clearfields)
         self.ui.btnClear.clicked.connect(self.clearfields)
+        self.ui.actionHelp.triggered.connect(self.helpdialog)
         self.ui.toolButtonHelp.clicked.connect(self.helpdialog)
+        self.ui.actionSave_plot_data.triggered.connect(self.saveData)
         self.ui.btnReviewSave.clicked.connect(self.saveData)
+        self.ui.action_Export_data_to_vbSPT.triggered.connect(self.exportData)
         self.ui.btnExport.clicked.connect(self.exportData)
+        self.ui.action_Load_dataset.triggered.connect(self.loadData)
         self.ui.btnReviewDataset.clicked.connect(self.loadData)
+        self.ui.actionAverage_MSD.triggered.connect(self.avgMSD)
+        self.ui.btnAvgMSD.clicked.connect(self.avgMSD)
         self.ui.checkExclude.clicked.connect(self.excludeTrack)
         self.ui.spinCurrentTrack.valueChanged.connect(self.loadTrack, self.ui.spinCurrentTrack.value())
         # self.ui.groupSD.clicked.connect(self.loadTrack,self.ui.spinCurrentTrack.value())
         self.ui.groupBoxTracks.setEnabled(False)
+        self.ui.action_Load_dataset.setEnabled(False)
+        self.ui.action_Export_data_to_vbSPT.setEnabled(False)
+        self.ui.actionSave_plot_data.setEnabled(False)
         # Setup ProgressBar
         self.progress = progress(self)
         self.finished = False
@@ -214,6 +226,7 @@ class MyApp(QtWidgets.QMainWindow):
                                         'CSV files (*.csv *.trc)')
         if fname:
             self.ui.txtInput.setText(str(fname[0]))
+            self.ui.statusBar.showMessage(str(fname[0]))
             # Check if both files selected
             if self.ui.txtOutputdir.text():
                 self.ui.btnRunScript.setEnabled(True)
@@ -232,7 +245,7 @@ class MyApp(QtWidgets.QMainWindow):
     def runscript(self):
         params = self.loadparams();
         if (params is None):
-            self.updateStatus("***ERROR: Settings invalid, exiting ***")
+            self.updateLog("***ERROR: Settings invalid, exiting ***")
             return 0
         # setup Tracker
         tracker = Tracker()
@@ -240,10 +253,10 @@ class MyApp(QtWidgets.QMainWindow):
         # Check input file has correct headings
         validinput = tracker.checkinputheaders(params['Input'])
         if (not validinput):
-            self.updateStatus("***ERROR: Input file not valid, exiting ***")
-            self.updateStatus("Order of rows (with/without headers) should be:")
+            self.updateLog("***ERROR: Input file not valid, exiting ***")
+            self.updateLog("Order of rows (with/without headers) should be:")
             for hdr in tracker.inputheaders:
-                self.updateStatus(hdr)
+                self.updateLog(hdr)
             return 0
 
         # Generate output file
@@ -252,18 +265,18 @@ class MyApp(QtWidgets.QMainWindow):
         minlength = float(params['Minlength'])
         maxlength = float(params['Maxlength'])
         tracker.framerate = round(self.ui.spinFramerate.value() / 60, 2)
-        self.updateStatus("Starting ...")
+        self.updateLog("Starting ...")
         tracker.load_input(params['Input'], minpoints, minlength, maxlength)
-        self.updateStatus("... Input loaded ...")
+        self.updateLog("... Input loaded ...")
         outputfilename = params['OutputFile']
         msg = tracker.write_output(outputfilename)
-        self.updateStatus(msg)
+        self.updateLog(msg)
 
         # Generate quiver plots (if required)
         if ("Completed" in msg) and (tracker.counter > 0):
-            self.updateStatus("TOTAL ROWS: " + str(tracker.counter))
-            self.updateStatus("TOTAL AVG TRACKS: " + str(len(tracker.avgplotter)))
-            self.updateStatus("TOTAL TRACKS: " + str(len(tracker.plotter)))
+            self.updateLog("TOTAL ROWS: " + str(tracker.counter))
+            self.updateLog("TOTAL AVG TRACKS: " + str(len(tracker.avgplotter)))
+            self.updateLog("TOTAL TRACKS: " + str(len(tracker.plotter)))
             plotnum = int(params['Plots'])
             msgs = []
             # All plots
@@ -277,7 +290,7 @@ class MyApp(QtWidgets.QMainWindow):
                 tracker.set_outputdir(outputdir)
                 tracker.set_fromplot(params['from'])
                 tracker.set_toplot(params['to'])
-                self.updateStatus("Creating " + str(plotnum) + " plots")
+                self.updateLog("Creating " + str(plotnum) + " plots")
 
                 # Extract subset
                 r = range(params['from'], params['to'])
@@ -289,14 +302,14 @@ class MyApp(QtWidgets.QMainWindow):
             self.settings.setValue('datafile', params['Input'])
             self.settings.setValue('outputdir', params['OutputDir'])
         else:
-            self.updateStatus("Error occurred - please check data files")
+            self.updateLog("Error occurred - please check data files")
 
     '''Create plots from output data - requires loaded tracker and range of plot numbers to plot
     '''
 
     def startPlots(self, plotrange):
         tracker = self.tracker
-        self.updateStatus("Output plots to " + tracker.outputdir)
+        self.updateLog("Output plots to " + tracker.outputdir)
         msgs = []
         self.progress.total(len(plotrange))
         self.progress.finished = False
@@ -316,10 +329,10 @@ class MyApp(QtWidgets.QMainWindow):
                 self.progress.update(i)
                 QtWidgets.QApplication.processEvents()
                 msg = tracker.plottrack(trak[0], totalplots, arrowwidth, pngplots)
-                # self.updateStatus(msg)
+                # self.updateLog(msg)
         self.progress.stop()
         msg = "Track plots done"
-        self.updateStatus(msg)
+        self.updateLog(msg)
         # create total plot - Matlab
         if (totalplots > 0):
             self.fig = plt.figure(tracker.alltracks + 1)
@@ -335,7 +348,7 @@ class MyApp(QtWidgets.QMainWindow):
             if (pngplots):
                 filename = tracker.outputdir + "Tracks_" + str(plotrange[0]) + "to" + str(plotrange[-1]) + ".png"
                 self.fig.savefig(filename, dpi=300, orientation='landscape', format='png')
-                self.updateStatus("Total Plot saved to " + filename)
+                self.updateLog("Total Plot saved to " + filename)
 
             if (self.ui.checkBoxMatlab.isChecked()):
                 self.tp = TrackerPlot()
@@ -344,7 +357,7 @@ class MyApp(QtWidgets.QMainWindow):
                 if self.ui.spinContours.value() > 0:
                     intervals = self.ui.spinContours.value()
                     msg = "Plotting Contour overlay with %d intervals ... please wait" % intervals
-                    self.updateStatus(msg)
+                    self.updateLog(msg)
                     # Add contours
                     tplot = ContourPlot()
                     tplot.loadarrays(tracker.allx, tracker.ally, tracker.allrho)
@@ -353,12 +366,12 @@ class MyApp(QtWidgets.QMainWindow):
                     tplot.linesonly = True
                     tplot.newfig = False
                     tplot.contour_region(mytitle)
-                    self.updateStatus("... done")
+                    self.updateLog("... done")
                 plt.show()
             # load in graphicsview
             self.total = len(tracker.plotter)  # tracker.alltracks #total averaged tracks
             self.initPlotReview()
-            self.ui.labelReviewPanel.setText("Loaded " + str(self.total) + " tracks")
+            self.ui.statusBar.showMessage("Loaded " + str(self.total) + " tracks")
 
     def initPlotReview(self):
         self.ui.groupBoxTracks.setEnabled(True)
@@ -369,9 +382,9 @@ class MyApp(QtWidgets.QMainWindow):
         self.ui.labelTotalTracks.setText(" of " + str(self.total))
 
         if (self.fname is not None):
-            self.ui.labelReviewPanel.setText("Loaded " + str(self.total) + " tracks from " + self.fname)
+            self.ui.statusBar.showMessage("Loaded " + str(self.total) + " tracks from " + self.fname)
         else:
-            self.ui.labelReviewPanel.setText("Loaded " + str(self.total) + " tracks")
+            self.ui.statusBar.showMessage("Loaded " + str(self.total) + " tracks")
 
     ''' Overwritten event for TrackerPlot.roiAction button
     '''
@@ -380,7 +393,7 @@ class MyApp(QtWidgets.QMainWindow):
         if (self.tp.poly):
             print('Polygon coords:', self.tp.poly)
             msg = self.tracker.plot_region(self.tp.poly.xy)
-            self.updateStatus(msg)
+            self.updateLog(msg)
 
     def showTrackXY(self, track, tracknum, x, y):
         tracklength = np.sqrt((x[-1] - x[0]) ** 2 + (y[-1] - y[0]) ** 2)
@@ -494,14 +507,18 @@ class MyApp(QtWidgets.QMainWindow):
 
         if fname:
             msg, total = self.tracker.save_data(fname, self.excluded)
-            self.updateStatus(msg)
+            self.updateLog(msg)
             fname = str.replace(fname, '.csv', '_msd.csv')
             intervals = int(self.ui.spinIntervals.value())
             msg = self.tracker.save_msd(fname, self.excluded,intervals)
-            self.updateStatus(msg)
+            self.updateLog(msg)
             self.total = total
             self.initPlotReview()
             self.loadTrack(1)
+
+    def avgMSD(self):
+        maxintervals = int(self.ui.spinIntervals.value())
+        self.tracker.generate_avgmsd(self.excluded, maxintervals)
 
     def exportData(self):
         params = self.loadparams();
@@ -516,7 +533,7 @@ class MyApp(QtWidgets.QMainWindow):
         spt.load_data(self.tracker)
         spt.save_mat(fname)
         msg = "Data exported to Matlab: " + fname
-        self.updateStatus(msg)
+        self.updateLog(msg)
 
     '''Load generated data files for review (and save) ONLY
     '''
@@ -533,12 +550,12 @@ class MyApp(QtWidgets.QMainWindow):
             self.tracker.load_plotdata(fname)
             self.fname = fname
             msg = "Plot data loaded from :" + fname + " [" + str(len(self.tracker.plotter)) + " tracks]"
-            self.updateStatus(msg)
+            self.updateLog(msg)
             self.ui.groupPlots.setEnabled(False)  # deactivate other controls as not available for review - use clear
             self.total = len(self.tracker.plotter)
             self.initPlotReview()
 
-    def updateStatus(self, txtout):
+    def updateLog(self, txtout):
         statusoutput = self.ui.listOutput.model()
         status = QtGui.QStandardItem(txtout)
         statusoutput.appendRow(status)

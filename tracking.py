@@ -183,8 +183,9 @@ class Tracker:
     Calculate MSD for each time interval per track
     Spatial displacement: pos at given t from initial pos
     MSD =<(x(t) - x0)^2>
+    numintervals = use only set number of intervals or 0 for all
     '''
-    def calculate_msd(self, plot):
+    def calculate_msd(self, plot, numintervals=0):
         # ptrack = self.getPlotByIndex(self.plotter,tracknum)
         ptracknum = plot[0]
         ptracklist = plot[1]
@@ -430,35 +431,14 @@ class Tracker:
         self.plotter = newplotter
         msg = str(ctr) + " tracks written to " + outfilename
         return msg, ctr
+
     """ Output MSD per time interval per track for max intervals
     Format: 'dT'. 'track1' 'track2' ...
     """
-    def save_msd(self, outfilename, excluded=[],max=10):
+    def save_msd(self, outfilename, excluded=[],maxintervals=10):
         msg = "Saving data ..."
-        ctr = 0;
-        newplotter = dict()
-        fieldnames = ['dT']
+        fieldnames,msdlist = self._generate_msdlist(excluded,maxintervals)
         plotlist = list(self.msd.items())
-        numcols = self.find_max_tracknum(plotlist)
-        #initialise & organise data
-        msdlist = [[0 for x in range(numcols+ 1)] for x in range(max + 1)]
-        msdlist[0][0] = 'dT'
-        for track in plotlist:
-            tracknum = track[0]
-            tracklist = track[1]
-            if (tracknum not in excluded):
-                newplotter.update({tracknum: tracklist})
-                fieldnames.append('track' + str(tracknum))
-
-                msdlist[0][tracknum] = 'track' + str(tracknum)
-                ctr = ctr + 1
-                for m in tracklist.items():
-                    dt = int(m[0])
-                    if (dt <= max):
-                        msdlist[dt][0] = dt
-                        msdlist[dt][tracknum] = m[1]
-        self.msd = newplotter # non-excluded plots
-
         try:
             if sys.version_info >= (3, 0, 0):
                 fo = open(outfilename, 'w', newline='')
@@ -475,7 +455,7 @@ class Tracker:
             se = []
             x = []
             #Syntax: writer.writerow({'dT': k,'track' + str(tracknum): v})
-            for rownum in range(1, max + 1):
+            for rownum in range(1, maxintervals + 1):
                 row ={}
                 for colnum in range(len(plotlist) + 1):
                     if msdlist[0][colnum]:
@@ -483,13 +463,51 @@ class Tracker:
                 writer.writerow(row)
                 #Averaged per time interval
                 y.append(np.mean(msdlist[rownum][1:-1]))
-                se.append(np.std(msdlist[rownum][1:-1]))
+                se.append(np.std(msdlist[rownum][1:-1])/np.sqrt(len(msdlist[rownum][1:-1])))
                 x.append(msdlist[rownum][0])
 
         self.show_avg_msd(x,y,se)
 
-        msg = str(ctr) + " MSD tracks written to " + outfilename
+        msg = "MSD plots written to " + outfilename
         return msg
+
+    def generate_avgmsd(self,excluded, maxintervals=10):
+        fieldnames,msdlist = self._generate_msdlist(excluded, maxintervals)
+        if (len(msdlist) > 0):
+            y = []
+            se = []
+            x = []
+            for rownum in range(1, maxintervals + 1):
+                #Averaged per time interval
+                y.append(np.mean(msdlist[rownum][1:-1]))
+                se.append(np.std(msdlist[rownum][1:-1])/np.sqrt(len(msdlist[rownum][1:-1])))
+                x.append(msdlist[rownum][0])
+            self.show_avg_msd(x,y,se)
+
+    def _generate_msdlist(self,excluded=[],max=10):
+        ctr = 0;
+        newplotter = dict()
+        fieldnames = ['dT']
+        plotlist = list(self.msd.items())
+        numcols = self.find_max_tracknum(plotlist)
+        #initialise & organise data
+        msdlist = [[0 for x in range(numcols+ 1)] for x in range(max + 1)]
+        msdlist[0][0] = 'dT'
+        for track in plotlist:
+            tracknum = track[0]
+            tracklist = track[1]
+            if (tracknum not in excluded):
+                newplotter.update({tracknum: tracklist})
+                fieldnames.append('track' + str(tracknum))
+                msdlist[0][tracknum] = 'track' + str(tracknum)
+                ctr = ctr + 1
+                for m in tracklist.items():
+                    dt = int(m[0])
+                    if (dt <= max):
+                        msdlist[dt][0] = dt
+                        msdlist[dt][tracknum] = m[1]
+        self.msd = newplotter # non-excluded plots
+        return fieldnames,msdlist
 
     def find_max_tracknum(self,plotlist):
         tracknums = []
@@ -526,13 +544,13 @@ class Tracker:
        Requires msdlist from generate_msdlist
        """
     def show_avg_msd(self,x=[],y=[],se=[]):
-        #if (len(x) <= 0): TODO
+
         slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
         fig = plt.figure()
         plt.xlim(min(x) - 1, max(x) + 1)
         plt.xlabel('dT')
         plt.ylabel('MSD (um2)')
-        plt.title('Avg MSD (slope=' + str(slope) + ')')
+        plt.title('Avg MSD (slope=' + str(round(slope,4)) + ' +/- ' + str(round(std_err,4)) + ')')
         plt.errorbar(x, y, se, linestyle='-', color='r',marker='o')
         plt.show()
 
