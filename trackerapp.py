@@ -378,6 +378,9 @@ class MyApp(QtWidgets.QMainWindow):
 
     def initPlotReview(self):
         self.ui.groupBoxTracks.setEnabled(True)
+        self.ui.action_Load_dataset.setEnabled(True)
+        self.ui.action_Export_data_to_vbSPT.setEnabled(True)
+        self.ui.actionSave_plot_data.setEnabled(True)
         self.current = 1
         self.excluded = []
         self.ui.spinCurrentTrack.setValue(self.current)
