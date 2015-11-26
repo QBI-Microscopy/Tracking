@@ -439,18 +439,17 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_20">
-        <property name="text">
-         <string>Displacement</string>
+       <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDoubleSpinBox" name="spinDisplacement">
-        <property name="toolTip">
-         <string>Minimum displacement length</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
         </property>
-       </widget>
+       </spacer>
       </item>
       <item>
        <widget class="QLabel" name="label_16">
@@ -461,7 +460,7 @@
          </size>
         </property>
         <property name="text">
-         <string> Track length: Min</string>
+         <string> Track displacement: Min</string>
         </property>
        </widget>
       </item>
@@ -949,7 +948,7 @@
       <string>Time intervals</string>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>370</x>
@@ -1071,7 +1070,6 @@
     </property>
     <addaction name="action_Open_input_file"/>
     <addaction name="actionO_utput_folder"/>
-    <addaction name="actionOu_tput_filename"/>
     <addaction name="separator"/>
     <addaction name="action_Load_dataset"/>
     <addaction name="actionSave_plot_data"/>
@@ -1191,12 +1189,15 @@
      <normaloff>resources/Help-browser.svg.png</normaloff>resources/Help-browser.svg.png</iconset>
    </property>
    <property name="text">
-    <string>Manua&amp;l</string>
+    <string>&amp;Help</string>
    </property>
   </action>
   <action name="action_Check_for_updates">
    <property name="text">
     <string>&amp;Check for updates</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
  </widget>
@@ -1216,7 +1217,6 @@
   <tabstop>spinContours</tabstop>
   <tabstop>spinArrowsize</tabstop>
   <tabstop>spinMinpoints</tabstop>
-  <tabstop>spinDisplacement</tabstop>
   <tabstop>spinMinlength</tabstop>
   <tabstop>spinMaxlength</tabstop>
   <tabstop>spinCurrentTrack</tabstop>

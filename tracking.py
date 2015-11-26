@@ -382,15 +382,8 @@ class Tracker:
                               myco.getpolar_rho(myco.dx, myco.dy),
                               myco.getpolar_theta(myco.dx, myco.dy),
                               len(self.coordlist[co]))
-                    # myco.dx = self.avg(avg_dx)
-                    # myco.dy = self.avg(avg_dy)
-                    # myco.rho = myco.getpolar_rho(myco.dx,myco.dy)
-                    # myco.theta = myco.getpolar_theta(myco.dx,myco.dy)
-                    # myco.framecount = len(self.coordlist[co])
                 else:
                     myco = self.coordlist[co][0]
-                    # myco.rho = myco.getpolar_rho(myco.dx,myco.dy)
-                    # myco.theta = myco.getpolar_theta(myco.dx,myco.dy)
 
                 writer.writerow(myco.get_rowoutput(self.numdecimal))
                 # group by tracknum for averaging
@@ -401,7 +394,6 @@ class Tracker:
 
     '''Write saved data to file and update plotter
     '''
-
     def save_data(self, outfilename, excluded=[]):
         msg = "Saving data ..."
         ctr = 0;
@@ -435,9 +427,9 @@ class Tracker:
     """ Output MSD per time interval per track for max intervals
     Format: 'dT'. 'track1' 'track2' ...
     """
-    def save_msd(self, outfilename, excluded=[],maxintervals=10):
+    def save_msd(self, outfilename, excluded=[],maxintervals=10, framerate=1):
         msg = "Saving data ..."
-        fieldnames,msdlist = self._generate_msdlist(excluded,maxintervals)
+        fieldnames,msdlist = self._generate_msdlist(excluded,maxintervals,framerate)
         plotlist = list(self.msd.items())
         try:
             if sys.version_info >= (3, 0, 0):
@@ -471,8 +463,8 @@ class Tracker:
         msg = "MSD plots written to " + outfilename
         return msg
 
-    def generate_avgmsd(self,excluded, maxintervals=10):
-        fieldnames,msdlist = self._generate_msdlist(excluded, maxintervals)
+    def generate_avgmsd(self,excluded, maxintervals=10,framerate=1):
+        fieldnames,msdlist = self._generate_msdlist(excluded, maxintervals,framerate)
         if (len(msdlist) > 0):
             y = []
             se = []
@@ -484,7 +476,7 @@ class Tracker:
                 x.append(msdlist[rownum][0])
             self.show_avg_msd(x,y,se)
 
-    def _generate_msdlist(self,excluded=[],max=10):
+    def _generate_msdlist(self,excluded=[],max=10, framerate=1):
         ctr = 0;
         newplotter = dict()
         fieldnames = ['dT']
@@ -504,7 +496,7 @@ class Tracker:
                 for m in tracklist.items():
                     dt = int(m[0])
                     if (dt <= max):
-                        msdlist[dt][0] = dt
+                        msdlist[dt][0] = dt * framerate
                         msdlist[dt][tracknum] = m[1]
         self.msd = newplotter # non-excluded plots
         return fieldnames,msdlist
@@ -514,31 +506,7 @@ class Tracker:
         for track in plotlist:
             tracknums.append(track[0])
         return max(tracknums)
-    # def write_msd(self,msdlist,outfilename,fieldnames):
-    #     try:
-    #         if sys.version_info >= (3, 0, 0):
-    #             fo = open(outfilename, 'w', newline='')
-    #         else:
-    #             fo = open(outfilename, 'wb')
-    #     except IOError:
-    #         msg = "ERROR: cannot access output file (maybe open in another program): " + outfilename
-    #         return msg
-    #     total = len(list(self.msd.items()))
-    #     if (len(msdlist) > 0):
-    #
-    #         with fo as outfile:
-    #             writer = csv.DictWriter(outfile, delimiter=',', dialect=csv.excel, fieldnames=fieldnames)
-    #             writer.writeheader()
-    #             #writer.writerow({'dT': k,'track' + str(tracknum): v})
-    #             for rownum in range(1, max + 1):
-    #                 row ={}
-    #                 for colnum in range(total + 1):
-    #                    row[msdlist[0][colnum]]= msdlist[rownum][colnum]
-    #                 writer.writerow(row)
-    #
-    #     else:
-    #         msg = "ERROR: msd data not found"
-    #         return msg
+
 
     """ Show MSD plots averaged
        Requires msdlist from generate_msdlist
@@ -547,12 +515,12 @@ class Tracker:
 
         slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
         fig = plt.figure()
-        plt.xlim(min(x) - 1, max(x) + 1)
+        plt.xlim(min(x) - min(x), max(x) + min(x))
         plt.xlabel('dT')
         plt.ylabel('MSD (um2)')
         plt.title('Avg MSD (slope=' + str(round(slope,4)) + ' +/- ' + str(round(std_err,4)) + ')')
         plt.errorbar(x, y, se, linestyle='-', color='r',marker='o')
-        plt.show()
+        plt.show(block=True)
 
     def load_plotdata(self, inputfilename):
         # Open input file

@@ -36,6 +36,7 @@ from tracking import Tracker
 from trackerplots.trackerSPT import TrackerSPT
 from trackerplots.trackerplot import TrackerPlot
 from trackerplots.contourplot import ContourPlot
+from trackerExportConfig import ExportConfig
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import (
@@ -100,6 +101,7 @@ class MyApp(QtWidgets.QMainWindow):
         # Set Graphics views
         self.init_graphics_views()
         # Set actions
+        self.ui.action_Run.triggered.connect(self.runscript)
         self.ui.btnRunScript.clicked.connect(self.runscript)
         self.ui.action_Open_input_file.triggered.connect(self.popupInput)
         self.ui.btnFileBrowser.clicked.connect(self.popupInput)
@@ -109,6 +111,7 @@ class MyApp(QtWidgets.QMainWindow):
         self.ui.btnClear.clicked.connect(self.clearfields)
         self.ui.actionHelp.triggered.connect(self.helpdialog)
         self.ui.toolButtonHelp.clicked.connect(self.helpdialog)
+        self.ui.actionA_bout.triggered.connect(self.aboutdialog)
         self.ui.actionSave_plot_data.triggered.connect(self.saveData)
         self.ui.btnReviewSave.clicked.connect(self.saveData)
         self.ui.action_Export_data_to_vbSPT.triggered.connect(self.exportData)
@@ -510,7 +513,8 @@ class MyApp(QtWidgets.QMainWindow):
             self.updateLog(msg)
             fname = str.replace(fname, '.csv', '_msd.csv')
             intervals = int(self.ui.spinIntervals.value())
-            msg = self.tracker.save_msd(fname, self.excluded,intervals)
+            framerate = float(self.ui.spinFramerate.value())
+            msg = self.tracker.save_msd(fname, self.excluded,intervals,framerate)
             self.updateLog(msg)
             self.total = total
             self.initPlotReview()
@@ -518,7 +522,8 @@ class MyApp(QtWidgets.QMainWindow):
 
     def avgMSD(self):
         maxintervals = int(self.ui.spinIntervals.value())
-        self.tracker.generate_avgmsd(self.excluded, maxintervals)
+        framerate = float(self.ui.spinFramerate.value())
+        self.tracker.generate_avgmsd(self.excluded, maxintervals,framerate)
 
     def exportData(self):
         params = self.loadparams();
@@ -530,10 +535,21 @@ class MyApp(QtWidgets.QMainWindow):
         outputfilename = str.replace(outputfilename, '.csv', '.mat')
         fname, _ = browser.getSaveFileName(self, 'Save as', outputfilename, 'Matlab files (*.mat)')
         spt = TrackerSPT()
+        cylinder, radius, timestep, stepsize, units, ok = ExportConfig.getExportConfig()
+
+        if ok:
+            spt.CylinderL = cylinder
+            spt.Radius = radius
+            spt.timestep = timestep
+            spt.stepSize = stepsize
+            msg = "ExportConfig data loaded"
+            self.updateLog(msg)
+           # units = units #TODO - translate to ?field
         spt.load_data(self.tracker)
         spt.save_mat(fname)
         msg = "Data exported to Matlab: " + fname
         self.updateLog(msg)
+        self.ui.statusBar.showMessage(msg)
 
     '''Load generated data files for review (and save) ONLY
     '''
@@ -575,6 +591,11 @@ class MyApp(QtWidgets.QMainWindow):
     def helpdialog(self):
         dialog = QtWidgets.QDialog()
         dialog.ui = uic.loadUi("tracker_help.ui", dialog)
+        dialog.show()
+
+    def aboutdialog(self):
+        dialog = QtWidgets.QDialog()
+        dialog.ui = uic.loadUi("tracker_about.ui", dialog)
         dialog.show()
 
     def closeEvent(self, event):
