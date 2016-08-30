@@ -29,7 +29,7 @@ plist= dict(CFBundleDisplayName='QBI Meunier Trackerapp',
 	CFBundleVersion='3.0')
 
 APP = ['trackerapp.py']
-DATA_FILES = ['resources','tracker.ui','tracker_help.ui','tracker_progress.ui']
+DATA_FILES = ['resources','tracker.ui','tracker_help.ui','tracker_progress.ui','tracker_about.ui','tracker_exportconfig.ui']
 OPTIONS = {'argv_emulation': True, 
 	'plist': plist,
 	'iconfile':'resources/target.icns',

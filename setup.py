@@ -34,14 +34,14 @@ if sys.platform == "win32":
 build_exe_options = {
     'includes' : ['sip', 'PyQt5'],
     'packages' : ['shapely'],
-    'include_files' : ['tracker.ui', 'tracker_progress.ui', 'tracker_help.ui', 'resources/',('D:\\Programs\\Python3\\Lib\\site-packages\\scipy\\special\\_ufuncs.pyd',
+    'include_files' : ['tracker.ui', 'tracker_progress.ui', 'tracker_help.ui', 'tracker_about.ui','tracker_exportconfig.ui','resources/',('D:\\Programs\\Python3\\Lib\\site-packages\\scipy\\special\\_ufuncs.pyd',
     '_ufuncs.pyd')],
     'include_msvcr' : 1
    }
 # [Bad fix but only thing that works] NB To add Shortcut working dir - change cx_freeze/windist.py Line 61 : last None - > "TARGETDIR" 
 setup(
         name = application_title,
-        version = "3.0",
+        version = "3.2",
         description = "Tracker script with GUI",
         author="Liz Cooper-Williams, QBI",
         author_email="e.cooperwilliams@uq.edu.au",

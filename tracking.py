@@ -84,7 +84,9 @@ class Coord:
         self.rho = rho
         self.theta = theta
         self.framecount = framecount
-        self.gradient = self.dy / self.dx
+        if (self.dx > 0):
+            self.gradient = self.dy / self.dx
+
         #self.sd = self.dx ** 2 + self.dy ** 2
 
     ''' Determines if x,y coordinates have changed
@@ -711,8 +713,8 @@ class Tracker:
     def getPlotByIndex(self, plotter, idx):
         plotlist = list(plotter.items())
         ptrack = plotlist[idx]
-        # ptracknum = ptrack[0]
-        # ptracklist = ptrack[1]
+        ptracknum = ptrack[0]
+
         return ptrack
 
 

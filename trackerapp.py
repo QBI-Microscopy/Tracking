@@ -327,11 +327,11 @@ class MyApp(QtWidgets.QMainWindow):
         i = 0
         for n in plotrange:
             if (self.progress.finished == False):
-                trak = self.tracker.getPlotByIndex(self.tracker.avgplotter, n - 1)
+                trak = self.tracker.getPlotByIndex(self.tracker.avgplotter, n)
                 i += 1
                 self.progress.update(i)
                 QtWidgets.QApplication.processEvents()
-                msg = tracker.plottrack(trak[0], totalplots, arrowwidth, pngplots)
+                msg = tracker.plottrack(trak, totalplots, arrowwidth, pngplots)
                 # self.updateLog(msg)
         self.progress.stop()
         msg = "Track plots done"
@@ -339,7 +339,7 @@ class MyApp(QtWidgets.QMainWindow):
         # create total plot - Matlab
         if (totalplots > 0):
             self.fig = plt.figure(tracker.alltracks + 1)
-            mytitle = "Quiver plot (avg) of " + str(len(tracker.plotter)) + " tracks (" + str(
+            mytitle = "Quiver plot (avg) of " + str(i) + " tracks (" + str(
                 len(tracker.allx)) + " points)"
             # mytitle = "Quiver plot (avg) of " + str(tracker.alltracks) + " tracks (" + str(len(tracker.allx)) + " points)"
             lines = plt.quiver(tracker.allx, tracker.ally, tracker.allrho, tracker.alltheta, units='x', pivot='tip',
