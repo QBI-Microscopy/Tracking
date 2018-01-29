@@ -6,20 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>730</width>
-    <height>700</height>
+    <width>1100</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>730</width>
-    <height>700</height>
+    <width>1100</width>
+    <height>900</height>
    </size>
   </property>
   <property name="font">
    <font>
     <family>Arial</family>
-    <pointsize>10</pointsize>
+    <pointsize>9</pointsize>
+    <stylestrategy>PreferAntialias</stylestrategy>
    </font>
   </property>
   <property name="windowTitle">
@@ -140,13 +141,13 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>107</y>
+      <y>100</y>
       <width>121</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Output Files Folder</string>
+     <string>Output Folder</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btnFolderBrowser">
@@ -188,10 +189,10 @@
    <widget class="QScrollArea" name="scrollOutput">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>602</y>
-      <width>621</width>
-      <height>61</height>
+      <x>160</x>
+      <y>660</y>
+      <width>891</width>
+      <height>181</height>
      </rect>
     </property>
     <property name="widgetResizable">
@@ -202,8 +203,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>619</width>
-       <height>59</height>
+       <width>889</width>
+       <height>179</height>
       </rect>
      </property>
      <widget class="QListView" name="listOutput">
@@ -211,8 +212,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>619</width>
-        <height>59</height>
+        <width>951</width>
+        <height>181</height>
        </rect>
       </property>
       <property name="editTriggers">
@@ -227,9 +228,9 @@
    <widget class="QLineEdit" name="txtOutputfile">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>96</y>
-      <width>171</width>
+      <x>650</x>
+      <y>100</y>
+      <width>431</width>
       <height>31</height>
      </rect>
     </property>
@@ -242,7 +243,7 @@
      <rect>
       <x>480</x>
       <y>104</y>
-      <width>61</width>
+      <width>151</width>
       <height>16</height>
      </rect>
     </property>
@@ -292,10 +293,10 @@
    <widget class="QGroupBox" name="groupPlots">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>130</y>
-      <width>711</width>
-      <height>121</height>
+      <width>981</width>
+      <height>131</height>
      </rect>
     </property>
     <property name="autoFillBackground">
@@ -310,7 +311,7 @@
        <x>20</x>
        <y>27</y>
        <width>59</width>
-       <height>16</height>
+       <height>21</height>
       </rect>
      </property>
      <property name="font">
@@ -329,8 +330,8 @@
       <rect>
        <x>20</x>
        <y>61</y>
-       <width>81</width>
-       <height>16</height>
+       <width>111</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="font">
@@ -349,8 +350,8 @@
       <rect>
        <x>20</x>
        <y>95</y>
-       <width>81</width>
-       <height>16</height>
+       <width>121</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="font">
@@ -366,10 +367,10 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>120</x>
-       <y>90</y>
-       <width>581</width>
-       <height>28</height>
+       <x>150</x>
+       <y>100</y>
+       <width>788</width>
+       <height>37</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -508,10 +509,10 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>120</x>
-       <y>53</y>
-       <width>585</width>
-       <height>31</height>
+       <x>150</x>
+       <y>60</y>
+       <width>814</width>
+       <height>37</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -672,10 +673,10 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>120</x>
-       <y>18</y>
-       <width>520</width>
-       <height>31</height>
+       <x>150</x>
+       <y>20</y>
+       <width>811</width>
+       <height>37</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -804,10 +805,15 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>611</y>
-      <width>81</width>
-      <height>41</height>
+      <y>690</y>
+      <width>111</width>
+      <height>61</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Clear</string>
@@ -826,20 +832,20 @@
    <widget class="QGraphicsView" name="graphicsView1">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>330</y>
-      <width>350</width>
-      <height>270</height>
+      <x>160</x>
+      <y>350</y>
+      <width>440</width>
+      <height>300</height>
      </rect>
     </property>
    </widget>
    <widget class="QGraphicsView" name="graphicsView2">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>330</y>
-      <width>350</width>
-      <height>270</height>
+      <x>620</x>
+      <y>350</y>
+      <width>440</width>
+      <height>300</height>
      </rect>
     </property>
    </widget>
@@ -850,8 +856,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>250</y>
-      <width>711</width>
+      <y>270</y>
+      <width>981</width>
       <height>71</height>
      </rect>
     </property>
@@ -864,9 +870,9 @@
     <widget class="QCheckBox" name="checkExclude">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>35</y>
-       <width>71</width>
+       <x>10</x>
+       <y>30</y>
+       <width>111</width>
        <height>21</height>
       </rect>
      </property>
@@ -874,56 +880,11 @@
       <string>Exclude</string>
      </property>
     </widget>
-    <widget class="QLabel" name="labelTotalTracks">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>30</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="spinCurrentTrack">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>30</y>
-       <width>51</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::LeftToRight</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_6">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>41</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Plot </string>
-     </property>
-    </widget>
     <widget class="QSpinBox" name="spinIntervals">
      <property name="geometry">
       <rect>
-       <x>300</x>
-       <y>40</y>
+       <x>240</x>
+       <y>30</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -938,9 +899,9 @@
     <widget class="QLabel" name="label_19">
      <property name="geometry">
       <rect>
-       <x>280</x>
-       <y>15</y>
-       <width>91</width>
+       <x>120</x>
+       <y>30</y>
+       <width>121</width>
        <height>21</height>
       </rect>
      </property>
@@ -953,8 +914,8 @@
       <rect>
        <x>370</x>
        <y>20</y>
-       <width>328</width>
-       <height>26</height>
+       <width>526</width>
+       <height>40</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1,1,1">
@@ -1009,9 +970,15 @@
      <rect>
       <x>480</x>
       <y>67</y>
-      <width>111</width>
+      <width>161</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+      <stylestrategy>PreferAntialias</stylestrategy>
+     </font>
     </property>
     <property name="text">
      <string>Frame interval (s)</string>
@@ -1020,7 +987,7 @@
    <widget class="QDoubleSpinBox" name="spinFramerate">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>650</x>
       <y>70</y>
       <width>62</width>
       <height>22</height>
@@ -1028,6 +995,51 @@
     </property>
     <property name="value">
      <double>0.020000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>360</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Plot </string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinCurrentTrack">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>410</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelTotalTracks">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>460</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
    <zorder>groupPlots</zorder>
@@ -1050,6 +1062,9 @@
    <zorder>groupBoxTracks</zorder>
    <zorder>label_17</zorder>
    <zorder>spinFramerate</zorder>
+   <zorder>label_6</zorder>
+   <zorder>spinCurrentTrack</zorder>
+   <zorder>labelTotalTracks</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -1057,8 +1072,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>730</width>
-     <height>18</height>
+     <width>1100</width>
+     <height>27</height>
     </rect>
    </property>
    <property name="nativeMenuBar">

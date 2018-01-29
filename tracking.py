@@ -548,7 +548,8 @@ class Tracker:
     '''
 
     def plottrack(self, trak, totalplots=0, arrow=0.1, png=1):
-        if (trak in self.avgplotter):
+        traknum = trak[0]
+        if (traknum in self.avgplotter):
 
             # create a plot of a track
             plotdir = self.outputdir
@@ -556,11 +557,11 @@ class Tracker:
             y = []
             rho = []
             theta = []
-            mytitle = "Track: " + str(trak)
+            mytitle = "Track: " + str(traknum)
             print(mytitle)
             msg = mytitle
             # sort track frames
-            tracklist = sorted(self.avgplotter[trak], key=lambda t: t.frame)
+            tracklist = sorted(self.avgplotter[traknum], key=lambda t: t.frame)
 
             for tn in tracklist:
                 x.append(tn.x)
@@ -576,7 +577,7 @@ class Tracker:
                 self.alltheta += theta
                 self.alltracks += 1
             if (png):
-                fig = plt.figure(trak)
+                fig = plt.figure(traknum)
                 plt.xlabel('x')
                 plt.ylabel('y')
                 plt.title(mytitle)
@@ -584,7 +585,7 @@ class Tracker:
                 lines = plt.quiver(x, y, rho, theta)
                 plt.setp(lines, color='b', antialiased=True)
                 # Write to file
-                filename = plotdir + "Track_" + str(trak) + ".png"
+                filename = plotdir + "Track_" + str(traknum) + ".png"
                 fig.savefig(filename, dpi=300, orientation='landscape', format='png')
                 msg = "Plot saved to " + filename
                 plt.cla()
@@ -712,8 +713,12 @@ class Tracker:
 
     def getPlotByIndex(self, plotter, idx):
         plotlist = list(plotter.items())
-        ptrack = plotlist[idx]
-        ptracknum = ptrack[0]
+        if idx >= len(plotlist):
+            print('Error: idx not in range -', idx)
+            ptrack = None
+        else:
+            ptrack = plotlist[idx]
+            ptracknum = ptrack[0]
 
         return ptrack
 

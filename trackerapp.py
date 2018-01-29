@@ -328,6 +328,8 @@ class MyApp(QtWidgets.QMainWindow):
         for n in plotrange:
             if (self.progress.finished == False):
                 trak = self.tracker.getPlotByIndex(self.tracker.avgplotter, n)
+                if trak is None:
+                    continue
                 i += 1
                 self.progress.update(i)
                 QtWidgets.QApplication.processEvents()
@@ -474,10 +476,11 @@ class MyApp(QtWidgets.QMainWindow):
         self.canvas = FigureCanvas(fig1)
         self.scene.addWidget(self.canvas)
         self.canvas.draw()
+
         # graphicsView2
         if (self.p2 is not None):
             plt.close(self.p2)
-        # MSD track  - should test that it is generated TODO
+        # MSD track  - should test that it is generated
         fig2 = self.showMSD(track, ptracknum, msdtrack)
         self.canvas2 = FigureCanvas(fig2)
         self.scene2.addWidget(self.canvas2)
