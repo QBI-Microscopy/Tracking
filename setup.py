@@ -41,7 +41,7 @@ build_exe_options = {
 # [Bad fix but only thing that works] NB To add Shortcut working dir - change cx_freeze/windist.py Line 61 : last None - > "TARGETDIR" 
 setup(
         name = application_title,
-        version = "3.2",
+        version = "3.2.1",
         description = "Tracker script with GUI",
         author="Liz Cooper-Williams, QBI",
         author_email="e.cooperwilliams@uq.edu.au",
